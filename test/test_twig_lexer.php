@@ -65,7 +65,7 @@ $lexer = new Twig_Lexer(new Twig_Environment(),
                           ));
 
 // @test
-$stream = $lexer->tokenize("/*:item*/'generated_uid'");
+$stream = $lexer->tokenize("/*:item*/'generated uid'");
 
 $token = $stream->next();
 $t->is($token->getType(), Twig_Token::VAR_START_TYPE, 'VAR_START_TYPE');
@@ -79,7 +79,17 @@ $t->is($token->getType(), Twig_Token::VAR_END_TYPE, 'VAR_END_TYPE');
 
 $token = $stream->next();
 $t->is($token->getType(), Twig_Token::TEXT_TYPE, 'TEXT_TYPE');
-$t->is($token->getValue(), "'generated_uid'", "value is 'generated_uid'");
+$t->is($token->getValue(), "'generated uid'", "value is 'generated uid'");
+
+// @test
+$stream = $lexer->tokenize("this is text");
+$t->is($stream->next()->getValue(), 'this is text');
+
+$stream = $lexer->tokenize("'here!!' label");
+$t->is($stream->next()->getValue(), "'here!!' label");
+
+$stream = $lexer->tokenize("3523.382, 2e10");
+$t->is($stream->next()->getValue(), "3523.382, 2e10");
 
 // @test
 $stream = $lexer->tokenize("/*# if True *//*# endif */");
