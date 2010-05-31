@@ -4,7 +4,6 @@ class SQLShade_Parser {
 
     protected $stream;
     protected $handlers;
-    protected $visitors;
     protected $env;
 
     public function __construct($env = null) {
@@ -19,16 +18,12 @@ class SQLShade_Parser {
 
     public function parse($stream) {
         $this->handlers = array();
-        $this->visitors = array();
 
         // tag handlers
         foreach ($this->env->getTokenParsers() as $handler) {
             $handler->setParser($this);
             $this->handlers[$handler->getTag()] = $handler;
         }
-
-        // node visitors
-        $this->visitors = $this->env->getNodeVisitors();
 
         $this->stream = $stream;
 
@@ -42,13 +37,7 @@ class SQLShade_Parser {
             throw $e;
         }
 
-        $node = new SQLShade_Node_Module($body, $this->stream->getFilename());
-        $t = new Twig_NodeTraverser($this->env);
-        foreach ($this->visitors as $visitor) {
-            $node = $t->traverse($node, $visitor);
-        }
-
-        return $node;
+        return new SQLShade_Node_Module($body, $this->stream->getFilename());
     }
 
     public function subparse($test, $drop_needle = false) {
@@ -86,6 +75,14 @@ class SQLShade_Parser {
 
                 if (!isset($this->handlers[$token->getValue()])) {
                     throw new SQLShade_SyntaxError(sprintf('Unknown tag name "%s"', $token->getValue()), $token->getLine());
+                }
+
+                $this->stream->next();
+
+                $subparser = $this->handlers[$token->getValue()];
+                $node = $subparser->parse($token);
+                if (!is_null($node)) {
+                    $rv[] = $node;
                 }
             }
             else {
