@@ -6,10 +6,11 @@ class SQLShade_Environment {
     protected $loader;
     protected $lexer;
     protected $parser;
+    protected $parsers;
     protected $extensions;
 
     public function __construct($options = array()) {
-        $this->setLexer(new Twig_Lexer());
+        $this->setLexer(new SQLShade_Lexer());
         $this->setParser(new SQLShade_Parser());
 
         $this->charset = isset($options['charset']) ? $options['charset'] : 'UTF-8';
@@ -40,6 +41,21 @@ class SQLShade_Environment {
 
     public function parse($tokens) {
         return $this->getParser()->parse($tokens);
+    }
+
+    public function getExtensions() {
+        return $this->extensions;
+    }
+
+    public function getTokenParsers() {
+        if ($this->parsers === null) {
+            $this->parsers = array();
+            foreach ($this->getExtensions() as $ext) {
+                $this->parsers = array_merge($this->parsers, $ext->getTokenParsers());
+            }
+        }
+
+        return $this->parsers;
     }
 
 }
