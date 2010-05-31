@@ -13,8 +13,14 @@ class SQLShade_Environment {
     protected $extensions;
 
     public function __construct($options = array()) {
-        $this->setLexer(new SQLShade_Lexer());
-        $this->setParser(new SQLShade_Parser());
+        $lexoptions = array(
+            'tag_comment'  => array('/*-', '*/'),
+            'tag_block'    => array('/*#', '*/'),
+            'tag_variable' => array('/*:', '*/'),
+            );
+
+        $this->setLexer(new SQLShade_Lexer($this, $lexoptions));
+        $this->setParser(new SQLShade_Parser($this));
 
         $this->charset = isset($options['charset']) ? $options['charset'] : 'UTF-8';
         $this->extensions = array('core' => new SQLShade_Extension_Core());
