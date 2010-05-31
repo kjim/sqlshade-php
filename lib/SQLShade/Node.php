@@ -2,10 +2,8 @@
 
 abstract class SQLShade_Node {
 
-    protected
-        $lineno,
-        $tag
-        ;
+    protected $lineno;
+    protected $tag;
 
     public function __construct($lineno, $tag = null) {
         $this->lineno = $lineno;

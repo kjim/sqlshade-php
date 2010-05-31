@@ -9,11 +9,19 @@ class SQLShade_Node_For extends SQLShade_Node {
     protected $body;
 
     public function __construct($item, $ident, SQLShade_Node_Compound $body, $lineno) {
-        parent::__construct($lineno);
+        parent::__construct($lineno, 'for');
 
         $this->item = $item;
         $this->ident = $ident;
         $this->body = $body;
+    }
+
+    public function getItem() {
+        return $this->item;
+    }
+
+    public function getIdent() {
+        return $this->ident;
     }
 
     public function getChildren() {

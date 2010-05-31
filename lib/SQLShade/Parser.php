@@ -1,4 +1,11 @@
 <?php
+require_once(dirname(__FILE__).'/Token.php');
+require_once(dirname(__FILE__).'/SyntaxError.php');
+
+require_once(dirname(__FILE__).'/Node/Module.php');
+require_once(dirname(__FILE__).'/Node/Literal.php');
+require_once(dirname(__FILE__).'/Node/Substitute.php');
+require_once(dirname(__FILE__).'/Node/Compound.php');
 
 class SQLShade_Parser {
 
@@ -47,29 +54,33 @@ class SQLShade_Parser {
             $tokentype = $this->getCurrentToken()->getType();
 
             // literal
-            if ($tokentype === Twig_Token::TEXT_TYPE) {
+            if ($tokentype === SQLShade_Token::TEXT_TYPE) {
                 $token = $this->stream->next();
                 $rv[] = new SQLShade_Node_Literal($token->getValue(), $token->getLine());
             }
 
             // substitute
-            else if ($tokentype === Twig_Token::VAR_START_TYPE) {
+            else if ($tokentype === SQLShade_Token::VAR_START_TYPE) {
                 $token = $this->stream->next();
                 $pname = $token->getValue();
-                $this->stream->expect(Twig_Token::VAR_END_TYPE);
+                $this->stream->expect(SQLShade_Token::VAR_END_TYPE);
                 $rv[] = new SQLShade_Node_Substitute($pname, $token->getLine());
             }
 
             // block
-            else if ($tokentype === Twig_Token::BLOCK_START_TYPE) {
+            else if ($tokentype === SQLShade_Token::BLOCK_START_TYPE) {
                 $this->stream->next(); // skip
                 $token = $this->getCurrentToken();
 
-                if ($token->getType() !== Twig_Token::NAME_TYPE) {
+                if ($token->getType() !== SQLShade_Token::NAME_TYPE) {
                     throw new SQLShade_SyntaxError('A block must start with a tag name', $token->getLine());
                 }
 
                 if (!is_null($test) && call_user_func($test, $token)) {
+                    if ($drop_needle) {
+                        $this->stream->next();
+                    }
+
                     return new SQLShade_Node_Compound($rv, $lineno);
                 }
 
@@ -99,6 +110,10 @@ class SQLShade_Parser {
 
     public function getStream() {
         return $this->stream;
+    }
+
+    public function setStream($stream) {
+        $this->stream = $stream;
     }
 
     public function getCurrentToken() {
