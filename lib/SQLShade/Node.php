@@ -24,6 +24,8 @@ abstract class SQLShade_Node {
         return $this->tag;
     }
 
-    abstract public function compile($compiler);
+    public function getChildren() {
+        return array();
+    }
 
 }
