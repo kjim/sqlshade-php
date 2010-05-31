@@ -25,7 +25,7 @@ class SQLShade_Node_Compound extends SQLShade_Node {
         return $this->nodes;
     }
 
-    public function appendNode(SQLShade_Node $node) {
+    public function appendNode(/*Node*/$node) {
         $this->nodes[] = $node;
     }
 
