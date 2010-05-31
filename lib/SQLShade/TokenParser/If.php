@@ -1,25 +1,26 @@
 <?php
 require_once(dirname(__FILE__).'/../TokenParser.php');
+require_once(dirname(__FILE__).'/../Token.php');
 require_once(dirname(__FILE__).'/../Node/For.php');
+require_once(dirname(__FILE__).'/../Node/Expression/Name.php');
 
-class SQLShade_TokenParser_If extends Twig_TokenParser {
+class SQLShade_TokenParser_If extends SQLShade_TokenParser {
 
-    public function parse(Twig_Token $token) {
+    public function parse(SQLShade_Token $token) {
         $lineno = $token->getLine();
 
         $token = $this->parser->getCurrentToken();
-        $token->expect(Twig_Token::NAME_TYPE);
+        $this->parser->getStream()->expect(SQLShade_Token::NAME_TYPE);
         $ident = new SQLShade_Node_Expression_Name($token->getValue(), $lineno);
 
-        $this->parser->getStream()->next();
-        $this->parser->getStream()->expect(Twig_Token::BLOCK_END_TYPE);
-        $compound = $this->parser->subparse(array($this, 'decideIfEnd'));
-        $this->parser->getStream()->expect(Twig_Token::BLOCK_END_TYPE);
+        $this->parser->getStream()->expect(SQLShade_Token::BLOCK_END_TYPE);
+        $compound = $this->parser->subparse(array($this, 'decideIfEnd'), true);
+        $this->parser->getStream()->expect(SQLShade_Token::BLOCK_END_TYPE);
 
-        return new SQLShade_Node_If($ident, $lineno);
+        return new SQLShade_Node_If($ident, $compound, $lineno);
     }
 
-    public function decideIfEnd() {
+    public function decideIfEnd($token) {
         return $token->test('endif');
     }
 
