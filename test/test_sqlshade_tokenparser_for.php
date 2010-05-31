@@ -34,10 +34,10 @@ $stream->next();
 
 $driveparser = new SQLShade_Parser($env);
 $driveparser->setStream($stream);
-$parser = new SQLShade_TokenParser_For();
-$parser->setParser($driveparser);
+$tokenparser = new SQLShade_TokenParser_For();
+$tokenparser->setParser($driveparser);
 
-$node = $parser->parse($token);
+$node = $tokenparser->parse($token);
 $t->ok($node instanceof SQLShade_Node_For,
        'SQLShade_TokenParser_For generates instance of SQLShade_Node_For');
 
