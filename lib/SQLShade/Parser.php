@@ -1,26 +1,23 @@
 <?php
 
-class SQLShade_Parser implements Twig_ParserInterface {
+class SQLShade_Parser {
 
-    protected
-        $stream,
-        $handlers,
-        $visitors,
-        $blocks,
-        $blockStack,
-        $env;
+    protected $stream;
+    protected $handlers;
+    protected $visitors;
+    protected $env;
 
-    public function __construct(Twig_Environment $env = null) {
+    public function __construct($env = null) {
         if (null != $env) {
             $this->setEnvironment($env);
         }
     }
 
-    public function setEnvironment(Twig_Environment $env) {
+    public function setEnvironment($env) {
         $this->env = $env;
     }
 
-    public function parse(Twig_TokenStream $stream) {
+    public function parse($stream) {
         $this->handlers = array();
         $this->visitors = array();
 
@@ -34,12 +31,10 @@ class SQLShade_Parser implements Twig_ParserInterface {
         $this->visitors = $this->env->getNodeVisitors();
 
         $this->stream = $stream;
-        $this->blocks = array();
-        $this->blockStack = array();
 
         try {
             $body = $this->subparse(null);
-        } catch (Twig_SyntaxError $e) {
+        } catch (SQLShade_SyntaxError $e) {
             if (is_null($e->getFilename())) {
                 $e->setFilename($this->stream->getFilename());
             }
@@ -47,7 +42,7 @@ class SQLShade_Parser implements Twig_ParserInterface {
             throw $e;
         }
 
-        $node = new SQLShade_Node_Module($body, $this->blocks, $this->stream->getFilename());
+        $node = new SQLShade_Node_Module($body, $this->stream->getFilename());
         $t = new Twig_NodeTraverser($this->env);
         foreach ($this->visitors as $visitor) {
             $node = $t->traverse($node, $visitor);
@@ -65,15 +60,15 @@ class SQLShade_Parser implements Twig_ParserInterface {
             // literal
             if ($tokentype === Twig_Token::TEXT_TYPE) {
                 $token = $this->stream->next();
-                $rv[] = new SQLShade_Node_Text($token->getValue(), $token->getLine());
+                $rv[] = new SQLShade_Node_Literal($token->getValue(), $token->getLine());
             }
 
-            // placeholder
+            // substitute
             else if ($tokentype === Twig_Token::VAR_START_TYPE) {
                 $token = $this->stream->next();
                 $pname = $token->getValue();
                 $this->stream->expect(Twig_Token::VAR_END_TYPE);
-                $rv[] = new SQLShade_Node_PlaceHolder($pname, $token->getLine());
+                $rv[] = new SQLShade_Node_Substitute($pname, $token->getLine());
             }
 
             // block
@@ -82,15 +77,15 @@ class SQLShade_Parser implements Twig_ParserInterface {
                 $token = $this->getCurrentToken();
 
                 if ($token->getType() !== Twig_Token::NAME_TYPE) {
-                    throw new Twig_SyntaxError('A block must start with a tag name', $token->getLine());
+                    throw new SQLShade_SyntaxError('A block must start with a tag name', $token->getLine());
                 }
 
                 if (!is_null($test) && call_user_func($test, $token)) {
-                    return new Twig_NodeList($rv, $lineno);
+                    return new SQLShade_Node_Compound($rv, $lineno);
                 }
 
                 if (!isset($this->handlers[$token->getValue()])) {
-                    throw new Twig_SyntaxError(sprintf('Unknown tag name "%s"', $token->getValue()), $token->getLine());
+                    throw new SQLShade_SyntaxError(sprintf('Unknown tag name "%s"', $token->getValue()), $token->getLine());
                 }
             }
             else {
@@ -98,39 +93,11 @@ class SQLShade_Parser implements Twig_ParserInterface {
             }
         }
 
-        return new Twig_NodeList($rv, $lineno);
+        return new SQLShade_Node_Compound($rv, $lineno);
     }
 
     public function addHandler($name, $class) {
         $this->handlers[$name] = $class;
-    }
-
-    public function addNodeVisitor(Twig_NodeVisitorInterface $visitor) {
-        $this->visitors[] = $visitor;
-    }
-
-    public function getBlockStack() {
-        return $this->blockStack;
-    }
-
-    public function peekBlockStack() {
-        return $this->blockStack[count($this->blockStack) - 1];
-    }
-
-    public function popBlockStack() {
-        array_pop($this->blockStack);
-    }
-
-    public function pushBlockStack($name) {
-        $this->blockStack[] = $name;
-    }
-
-    public function hasBlock($name) {
-        return isset($this->blocks[$name]);
-    }
-
-    public function setBlock($name, $value) {
-        $this->blocks[$name] = $value;
     }
 
     public function getStream() {
