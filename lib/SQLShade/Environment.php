@@ -1,4 +1,7 @@
 <?php
+require_once(dirname(__FILE__).'/Lexer.php');
+require_once(dirname(__FILE__).'/Parser.php');
+require_once(dirname(__FILE__).'/Extension/Core.php');
 
 class SQLShade_Environment {
 
