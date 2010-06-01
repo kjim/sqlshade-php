@@ -67,4 +67,8 @@ class SQLShade_Environment {
         return $this->parsers;
     }
 
+    public function getTemplateClass($filename) {
+        return '__SQLShadeTemplate_' . md5($filename);
+    }
+
 }
