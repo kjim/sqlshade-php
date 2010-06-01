@@ -42,7 +42,6 @@ $node = $tokenparser->parse($token);
 $t->ok($node instanceof SQLShade_Node_For,
        'SQLShade_TokenParser_For generates instance of SQLShade_Node_For');
 
-$t->is($node->getNodeTag(), 'for');
 $t->ok($node->getItem() instanceof SQLShade_Node_Expression_AssignName,
        'getItem() returns instance of SQLShade_Node_Expression_AssignName');
 $t->ok($node->getIdent() instanceof SQLShade_Node_Expression_Name,

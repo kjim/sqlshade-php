@@ -3,11 +3,9 @@
 abstract class SQLShade_Node {
 
     protected $lineno;
-    protected $tag;
 
-    public function __construct($lineno, $tag = null) {
+    public function __construct($lineno) {
         $this->lineno = $lineno;
-        $this->tag = $tag;
     }
 
     public function __toString() {
@@ -18,12 +16,28 @@ abstract class SQLShade_Node {
         return $this->lineno;
     }
 
-    public function getNodeTag() {
-        return $this->tag;
-    }
-
     public function getChildren() {
         return array();
+    }
+
+    public function acceptVisitor($visitor, $opts = null) {
+        $method = $this->getVisitName();
+        if (method_exists($visitor, $method)) {
+            $visitor->$method($this, $opts);
+        }
+        else {
+            $this->traverse($this, $visitor, $opts);
+        }
+    }
+
+    protected function traverse($node, $visitor, $opts = null) {
+        foreach ($node->getChildren() as $n) {
+            $n->acceptVisitor($visitor, $opts);
+        }
+    }
+
+    protected function getVisitName() {
+        return 'visit' . array_pop(explode('_', get_class($this)));
     }
 
 }
