@@ -32,3 +32,29 @@ $t->is($template->render(array()), 'SELECT * FROM t_table;',
        'CompiledTemplate class has method render()');
 $t->is($template->getName(), $templateName,
        'CompiledTemplate class has method getName()');
+
+// @test
+$templateName = 'template_2.sql';
+$node = new SQLShade_Node_Module(
+    new SQLShade_Node_Compound(
+        array(
+            new SQLShade_Node_Substitute(
+                new SQLShade_Node_Expression_Name('uid', 1), '123456', 1),
+            ), 1),
+    $templateName);
+$source = $compiler->compile($node);
+loadsource($source);
+
+$cls = $env->getTemplateClass($templateName);
+$template = new $cls();
+$t->is($template->render(array('uid' => 3456)), '?',
+       'scalar makes one placeholder');
+$t->is($template->render(array('uid' => array(1, 2, 3, 4))), '(?, ?, ?, ?)',
+       'array makes paren placeholder');
+
+try {
+    $template->render(array());
+    $t->fail();
+} catch (Exception $e) {
+    $t->pass();
+}
