@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__).'/../Node.php');
 
 class SQLShade_Node_Module extends SQLShade_Node {
 
@@ -14,6 +15,10 @@ class SQLShade_Node_Module extends SQLShade_Node {
 
     public function getBody() {
         return $this->body;
+    }
+
+    public function getFilename() {
+        return $this->filename;
     }
 
 }
