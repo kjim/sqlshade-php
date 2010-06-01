@@ -39,3 +39,48 @@ $t->is($node->getFaketext(), "'faketext'", "faketext is 'faketext'");
 
 $token = $stream1->getCurrent();
 $t->is($token->getValue(), '', "getValue() not return 'faketext' value");
+
+// @test
+$stream2 = new SQLShade_TokenStream(
+    array(
+        new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'item', 1),
+        new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::TEXT_TYPE, "'faketext'", 1),
+
+        new SQLShade_Token(SQLShade_Token::EOF_TYPE, '', 1),
+        ),
+    'example.sql'
+    );
+
+// @test
+$shouldBeCloseParen = ")";
+$parse = "_parseUntilEndOfFaketext";
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo')", $shouldBeCloseParen), 7);
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo') ", $shouldBeCloseParen), 7);
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo)')", $shouldBeCloseParen), 8);
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo)') ", $shouldBeCloseParen), 8);
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo) \\'bar ')", $shouldBeCloseParen), 15);
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo) \\'bar ') ", $shouldBeCloseParen), 15);
+
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo', 'bar', 'baz')", $shouldBeCloseParen), 21);
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo', 'bar', 'baz') ", $shouldBeCloseParen), 21);
+$t->is(SQLShade_TokenParser_Substitute::$parse("(1, 2, 3) ", $shouldBeCloseParen), 9);
+$t->is(SQLShade_TokenParser_Substitute::$parse("(CURRENT_TIMESTAMP, now(), '2010-03-06 12:00:00')", $shouldBeCloseParen), 49);
+$t->is(SQLShade_TokenParser_Substitute::$parse("(CURRENT_TIMESTAMP, now(), '2010-03-06 12:00:00') ", $shouldBeCloseParen), 49);
+
+$t->is(SQLShade_TokenParser_Substitute::$parse("CURRENT_TIMESTAMP"), 17);
+$t->is(SQLShade_TokenParser_Substitute::$parse("CURRENT_TIMESTAMP "), 17);
+$t->is(SQLShade_TokenParser_Substitute::$parse("now()"), 5);
+$t->is(SQLShade_TokenParser_Substitute::$parse("now() "), 5);
+$t->is(SQLShade_TokenParser_Substitute::$parse("(cast('323' as Number), to_int(now()))", $shouldBeCloseParen), 38);
+$t->is(SQLShade_TokenParser_Substitute::$parse("(cast('323' as Number), to_int(now())) ", $shouldBeCloseParen), 38);
+
+
+$t->is(SQLShade_TokenParser_Substitute::$parse(""), -1);
+$t->is(SQLShade_TokenParser_Substitute::$parse(" "), -1);
+$t->is(SQLShade_TokenParser_Substitute::$parse("("), -1);
+$t->is(SQLShade_TokenParser_Substitute::$parse("( "), -1);
+$t->is(SQLShade_TokenParser_Substitute::$parse(")"), -1);
+$t->is(SQLShade_TokenParser_Substitute::$parse(") "), -1);
+$t->is(SQLShade_TokenParser_Substitute::$parse("()", $shouldBeCloseParen), 2);

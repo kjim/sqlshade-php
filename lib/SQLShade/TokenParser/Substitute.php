@@ -25,14 +25,13 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
             throw new SQLShade_SyntaxError('Substitute must need fake literal', $token->getLine());
         }
 
-        $faketext = $this->_parseFaketext($token);
-        $token->setValue(str_replace($faketext, '', $token->getValue()));
+        $tokenvalue = $token->getValue();
+        $faketext = $this->_parseFaketext($tokenvalue, $token->getLine());
+        $token->setValue(str_replace($faketext, '', $tokenvalue));
         return new SQLShade_Node_Substitute($ident, $faketext, $lineno);
     }
 
-    public function _parseFaketext($token) {
-        $lineno = $token->getLine();
-        $text = $token->getValue();
+    public function _parseFaketext($text, $lineno) {
         if (is_null($text) || strlen($text) <= 0) {
             return ''; // return empty string
         }
@@ -56,7 +55,7 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
 
         list($stack, $string, $escape) = array(0, false, false);
         if (!is_null($shouldBeEndChar)) {
-            $end = array($shouldBeEndChar);
+            $end = array($shouldBeEndChar => true);
             $offset = 1;
         }
         else {
@@ -65,8 +64,10 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         }
 
         $len = strlen($text);
+        $lastindex = 0;
         for ($i = 0; $i < $len; $i++) {
             $c = $text[$i];
+            $lastindex = $i;
             if ($string === false) {
                 if ($c === "(") {
                     $stack += 1;
@@ -93,7 +94,7 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         }
 
         if ($stack === 0 && $string === false && !array_key_exists($c, $end)) {
-            return $i + 1;
+            return $lastindex + 1;
         }
         else {
             return -1;
