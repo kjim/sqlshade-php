@@ -101,4 +101,8 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         }
     }
 
+    public function getTag() {
+        return "substitute";
+    }
+
 }
