@@ -61,10 +61,19 @@ class SQLShade_Parser {
 
             // substitute
             else if ($tokentype === SQLShade_Token::VAR_START_TYPE) {
-                $token = $this->stream->next();
-                $pname = $token->getValue();
-                $this->stream->expect(SQLShade_Token::VAR_END_TYPE);
-                $rv[] = new SQLShade_Node_Substitute($pname, $token->getLine());
+                $this->stream->next();
+                $token = $this->getCurrentToken();
+
+                if ($token->getType() !== SQLShade_Token::NAME_TYPE) {
+                    throw new SQLShade_SyntaxError('A substitute must need varname', $token->getLine());
+                }
+
+                if (!isset($this->handlers['substitute'])) {
+                    throw new SQLShade_Error('substitute handler is not registered');
+                }
+
+                $subparser = $this->handlers['substitute'];
+                $rv[] = $subparser->parse($token);
             }
 
             // block
