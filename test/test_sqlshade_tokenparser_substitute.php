@@ -46,12 +46,21 @@ $stream2 = new SQLShade_TokenStream(
         new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
         new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'item', 1),
         new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 1),
-        new SQLShade_Token(SQLShade_Token::TEXT_TYPE, "'faketext'", 1),
+        new SQLShade_Token(SQLShade_Token::TEXT_TYPE, "123456 AND ...", 1),
 
         new SQLShade_Token(SQLShade_Token::EOF_TYPE, '', 1),
         ),
     'example.sql'
     );
+$token = $stream2->next();
+$driveparser->setStream($stream2);
+
+$node = $tokenparser->parse($token);
+$t->ok($node instanceof Sqlshade_Node_Substitute);
+$t->is($node->getFaketext(), "123456", "faketext is 123456");
+
+$token = $stream2->getCurrent();
+$t->is($token->getValue(), ' AND ...', "getValue() return value has no literal 123456");
 
 // @test
 $shouldBeCloseParen = ")";
