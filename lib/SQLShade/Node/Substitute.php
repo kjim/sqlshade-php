@@ -13,4 +13,12 @@ class SQLShade_Node_Substitute extends SQLShade_Node {
         $this->faketext = $faketext;
     }
 
+    public function getIdent() {
+        return $this->ident;
+    }
+
+    public function getFaketext() {
+        return $this->faketext;
+    }
+
 }

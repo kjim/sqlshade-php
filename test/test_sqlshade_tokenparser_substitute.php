@@ -9,6 +9,9 @@ $t = new lime_test();
 
 // @setup
 $env = new SQLShade_Environment();
+$driveparser = new SQLShade_Parser($env);
+$tokenparser = new SQLShade_TokenParser_Substitute();
+$tokenparser->setParser($driveparser);
 
 // @test
 $stream1 = new SQLShade_TokenStream(
@@ -23,11 +26,16 @@ $stream1 = new SQLShade_TokenStream(
     'example.sql'
     );
 $token = $stream1->next(); // item
-
-$driveparser = new SQLShade_Parser($env);
 $driveparser->setStream($stream1);
-$tokenparser = new SQLShade_TokenParser_Substitute();
-$tokenparser->setParser($driveparser);
 
 $node = $tokenparser->parse($token);
-echo($node);
+$t->ok($node instanceof SQLShade_Node_Substitute,
+       'return node is instance of SQLShade_Node_Substitute');
+
+$t->ok($node->getIdent() instanceof SQLShade_Node_Expression_Name,
+       'getIdent() return value is instance of SQLShade_Node_Expression_Name');
+$t->is($node->getIdent()->getName(), 'item');
+$t->is($node->getFaketext(), "'faketext'", "faketext is 'faketext'");
+
+$token = $stream1->getCurrent();
+$t->is($token->getValue(), '', "getValue() not return 'faketext' value");
