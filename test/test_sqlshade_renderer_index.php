@@ -1,19 +1,14 @@
 <?php
 require_once(dirname(__FILE__).'/bootstrap.php');
-require_once(dirname(__FILE__).'/../lib/SQLShade/Compiler/Index.php');
+require_once(dirname(__FILE__).'/../lib/SQLShade/Renderer/Index.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Environment.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Module.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Compound.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Literal.php');
-require_once(dirname(__FILE__).'/../lib/SQLShade/CompiledTemplate.php');
-
-function loadsource($source) {
-    eval('?>'.$source);
-}
 
 $t = new lime_test();
 $env = new SQLShade_Environment();
-$compiler = new SQLShade_Compiler_Index($env);
+$renderer = new SQLShade_Renderer_Index($env);
 
 // @test
 $templateName = 'template_1.sql';
@@ -23,15 +18,10 @@ $node = new SQLShade_Node_Module(
             new SQLShade_Node_Literal('SELECT * FROM t_table;', 1),
             ), 1),
     $templateName);
-$source = $compiler->compile($node);
-loadsource($source);
+list($query, $bound) = $renderer->render($node, array());
 
-$cls = $env->getTemplateClass($templateName);
-$template = new $cls();
-$t->is($template->render(array()), 'SELECT * FROM t_table;',
-       'CompiledTemplate class has method render()');
-$t->is($template->getName(), $templateName,
-       'CompiledTemplate class has method getName()');
+$t->is($query, 'SELECT * FROM t_table;', 'generates query for prepare');
+$t->is($bound, array(), 'bound variables are empty');
 
 // @test
 $templateName = 'template_2.sql';
@@ -42,15 +32,13 @@ $node = new SQLShade_Node_Module(
                 new SQLShade_Node_Expression_Name('uid', 1), '123456', 1),
             ), 1),
     $templateName);
-$source = $compiler->compile($node);
-loadsource($source);
+list($query, $bound) = $renderer->render($node, array('uid' => 3456));
+$t->is($query, '?', 'scalar makes one placeholder');
+$t->is($bound, array(3456));
 
-$cls = $env->getTemplateClass($templateName);
-$template = new $cls();
-$t->is($template->render(array('uid' => 3456)), '?',
-       'scalar makes one placeholder');
-$t->is($template->render(array('uid' => array(1, 2, 3, 4))), '(?, ?, ?, ?)',
-       'array makes paren placeholder');
+list($query, $bound) = $renderer->render($node, array('uid' => array(1, 2, 3, 4)));
+$t->is($query, '(?, ?, ?, ?)', 'array makes paren placeholders');
+$t->is($bound, array(1, 2, 3, 4), 'bound 4 variables');
 
 try {
     $template->render(array());
