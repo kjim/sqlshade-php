@@ -41,8 +41,8 @@ $t->is($query, '(?, ?, ?, ?)', 'array makes paren placeholders');
 $t->is($bound, array(1, 2, 3, 4), 'bound 4 variables');
 
 try {
-    $template->render(array());
+    $renderer->render($node, array());
     $t->fail();
-} catch (Exception $e) {
-    $t->pass();
+} catch (SQLShade_RenderError $e) {
+    $t->pass('raise error if not pass parameter in context');
 }

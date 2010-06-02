@@ -20,7 +20,7 @@ abstract class SQLShade_Node {
         return array();
     }
 
-    public function acceptVisitor($visitor, $opts = null) {
+    public function acceptVisitor($visitor, &$opts = null) {
         $method = $this->getVisitName();
         if (method_exists($visitor, $method)) {
             $visitor->$method($this, $opts);
@@ -30,7 +30,7 @@ abstract class SQLShade_Node {
         }
     }
 
-    protected function traverse($node, $visitor, $opts = null) {
+    protected function traverse($node, $visitor, &$opts = null) {
         foreach ($node->getChildren() as $n) {
             $n->acceptVisitor($visitor, $opts);
         }

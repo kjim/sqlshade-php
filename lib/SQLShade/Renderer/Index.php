@@ -1,5 +1,7 @@
 <?php
 require_once(dirname(__FILE__).'/../Printer/Index.php');
+require_once(dirname(__FILE__).'/../RenderContext.php');
+require_once(dirname(__FILE__).'/../RenderError.php');
 
 class SQLShade_Renderer_Index {
 
@@ -11,40 +13,74 @@ class SQLShade_Renderer_Index {
         $this->strict = true;
     }
 
-    public function render(/*Node_Module*/$node) {
-        $printer = new SQLShade_Printer_PHP();
-        $this->printTemplate($node, $printer);
-
-        $this->traverse($moduleNode->getBody(), $printer);
-        return $printer->getSource();
+    public function render(/*Node_Module*/$node, $data = array()) {
+        $printer = new SQLShade_Printer_Index();
+        $context = array(
+            'printer' => $printer,
+            'context' => new SQLShade_RenderContext($data),
+            );
+        $this->traverse($node->getBody(), $context);
+        return $printer->freeze();
     }
 
-    protected function traverse($node, $printer) {
+    protected function traverse($node, &$ctx) {
         foreach ($node->getChildren() as $n) {
-            $n->acceptVisitor($this, $printer);
+            $n->acceptVisitor($this, $ctx);
         }
     }
 
-    public function visitLiteral($node, $printer) {
+    public function visitLiteral($node, &$ctx) {
+        $printer = $ctx['printer'];
+        $printer->write($node->getLiteral());
     }
 
-    public function visitSubstitute($node, $printer) {
-        $this->writeSubstitute($node, $printer);
+    public function visitSubstitute($node, &$ctx) {
+        $context = $ctx['context'];
+        $ident = $node->getIdent()->getName();
+        $text = $node->getFaketext();
+        try {
+            $variable = $context->data[$ident];
+        } catch (SQLShade_KeyError $e) {
+            if ($this->strict) {
+                throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+            }
+            else {
+                $ctx['printer']->write("/*:{$ident}*/$text");
+            }
+            return;
+        }
+        $this->writeSubstitute($node, $ctx, $variable);
     }
 
-    protected function writeSubstitute($node, $printer) {
+    protected function writeSubstitute($node, &$ctx, &$variable) {
+        $printer = $ctx['printer'];
+        if (is_array($variable)) {
+            if (count($variable) === 0) {
+                throw new SQLShade_RenderError('Binding data should not be empty');
+            }
+            $l = array();
+            foreach ($variable as &$v) {
+                $printer->bind($v);
+                $l[] = '?';
+            }
+            $printer->write('(' . implode(', ', $l) . ')');
+        }
+        else {
+            $printer->write('?');
+            $printer->bind($variable);
+        }
     }
 
-    public function visitEmbed($node, $printer) {
+    public function visitEmbed($node, &$ctx) {
     }
 
-    public function visitEval($node, $printer) {
+    public function visitEval($node, &$ctx) {
     }
 
-    public function visitIf($node, $printer) {
+    public function visitIf($node, &$ctx) {
     }
 
-    public function visitFor($node, $printer) {
+    public function visitFor($node, &$ctx) {
     }
 
 }
