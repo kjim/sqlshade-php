@@ -19,7 +19,7 @@ class SQLShade_Printer_Index {
     }
 
     public function freeze() {
-        return array(&$buf, &$bound);
+        return array(&$this->buf, &$this->bound);
     }
 
 }
