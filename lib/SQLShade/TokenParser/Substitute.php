@@ -55,11 +55,11 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
 
         list($stack, $string, $escape) = array(0, false, false);
         if (!is_null($shouldBeEndChar)) {
-            $end = array($shouldBeEndChar => true);
+            $end = array($shouldBeEndChar);
             $offset = 1;
         }
         else {
-            $end = array(' ' => true, '\n' => true, '\r' => true);
+            $end = array(" ", "\n", "\r");
             $offset = 0;
         }
 
@@ -88,12 +88,12 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
                 $escape = false;
             }
 
-            if ($stack === 0 && $string === false && array_key_exists($c, $end) && $i > 0) {
+            if ($stack === 0 && $string === false && in_array($c, $end) && $i > 0) {
                 return $i + $offset;
             }
         }
 
-        if ($stack === 0 && $string === false && !array_key_exists($c, $end)) {
+        if ($stack === 0 && $string === false && !in_array($c, $end)) {
             return $lastindex + 1;
         }
         else {

@@ -67,6 +67,8 @@ $shouldBeCloseParen = ")";
 $parse = "_parseUntilEndOfFaketext";
 $t->is(SQLShade_TokenParser_Substitute::$parse("('foo')", $shouldBeCloseParen), 7);
 $t->is(SQLShade_TokenParser_Substitute::$parse("('foo') ", $shouldBeCloseParen), 7);
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo')\nA", $shouldBeCloseParen), 7);
+$t->is(SQLShade_TokenParser_Substitute::$parse("('foo')\rA", $shouldBeCloseParen), 7);
 $t->is(SQLShade_TokenParser_Substitute::$parse("('foo)')", $shouldBeCloseParen), 8);
 $t->is(SQLShade_TokenParser_Substitute::$parse("('foo)') ", $shouldBeCloseParen), 8);
 $t->is(SQLShade_TokenParser_Substitute::$parse("('foo) \\'bar ')", $shouldBeCloseParen), 15);
@@ -80,11 +82,11 @@ $t->is(SQLShade_TokenParser_Substitute::$parse("(CURRENT_TIMESTAMP, now(), '2010
 
 $t->is(SQLShade_TokenParser_Substitute::$parse("CURRENT_TIMESTAMP"), 17);
 $t->is(SQLShade_TokenParser_Substitute::$parse("CURRENT_TIMESTAMP "), 17);
+$t->is(SQLShade_TokenParser_Substitute::$parse("CURRENT_TIMESTAMP\nA"), 17);
 $t->is(SQLShade_TokenParser_Substitute::$parse("now()"), 5);
 $t->is(SQLShade_TokenParser_Substitute::$parse("now() "), 5);
 $t->is(SQLShade_TokenParser_Substitute::$parse("(cast('323' as Number), to_int(now()))", $shouldBeCloseParen), 38);
 $t->is(SQLShade_TokenParser_Substitute::$parse("(cast('323' as Number), to_int(now())) ", $shouldBeCloseParen), 38);
-
 
 $t->is(SQLShade_TokenParser_Substitute::$parse(""), -1);
 $t->is(SQLShade_TokenParser_Substitute::$parse(" "), -1);
