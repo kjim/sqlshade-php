@@ -52,6 +52,23 @@ class SQLShade_Environment {
         return $this->getParser()->parse($tokens);
     }
 
+    public function getRenderer() {
+        return $this->renderer;
+    }
+
+    public function setRenderer($renderer) {
+        $this->renderer = $renderer;
+        $renderer->setEnvironment($this);
+    }
+
+    public function render($node) {
+        return $this->getRenderer()->render($node);
+    }
+
+    public function compileSource($source, $name) {
+        return $this->parse($this->tokenize($source, $name));
+    }
+
     public function getExtensions() {
         return $this->extensions;
     }

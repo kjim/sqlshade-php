@@ -17,7 +17,7 @@ class SQLShade_Renderer_Index {
         $printer = new SQLShade_Printer_Index();
         $context = array(
             'printer' => $printer,
-            'context' => new SQLShade_RenderContext($data),
+            'context' => is_array($data) ? new SQLShade_RenderContext($data) : $data,
             );
         $this->traverse($node->getBody(), $context);
         return $printer->freeze();
@@ -86,6 +86,31 @@ class SQLShade_Renderer_Index {
     }
 
     public function visitEval($node, &$ctx) {
+        $context = $ctx['context'];
+        $ident = $node->getIdent()->getName();
+        $source = $this->getdata($ident, $context);
+        $this->writeEval($node, $ctx, $source);
+    }
+
+    protected function writeEval($node, &$ctx, &$source) {
+        $subNode = $this->env->compileSource($source, '<inner_source>');
+        list($innerQuery, $innerBounds) = $this->render($subNode, clone $ctx['context']);
+
+        $printer = $ctx['printer'];
+        $printer->write($innerQuery);
+        foreach ($innerBounds as $v) {
+            $printer->bind($v);
+        }
+    }
+
+    protected function getdata($ident, &$context) {
+        try {
+            return $context->data[$ident];
+        } catch (SQLShade_KeyError $e) {
+            if ($this->strict) {
+                throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+            }
+        }
     }
 
     public function visitIf($node, &$ctx) {
