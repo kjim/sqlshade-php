@@ -105,3 +105,52 @@ try {
 } catch (SQLShade_RenderError $e) {
     $t->pass('parameter "id" is not feed');
 }
+
+// @test
+$templateName = 'test_if.sql';
+$node = new SQLShade_Node_Module(
+    new SQLShade_Node_Compound(
+        array(
+            new SQLShade_Node_Literal('SELECT * FROM t_table ', 1),
+            new SQLShade_Node_If(
+                new SQLShade_Node_Expression_Name('boolean_item', 1),
+                new SQLShade_Node_Compound(
+                    array(
+                        new SQLShade_Node_Literal('WHERE TRUE', 1),
+                        ),
+                    1),
+                1),
+            new SQLShade_Node_Literal(';', 1),
+            ),
+        1),
+    $templateName);
+// boolean
+list($query, $_) = $renderer->render($node, array('boolean_item' => true));
+$t->like($query, '/WHERE TRUE/', 'true is enable if-block');
+
+list($query, $_) = $renderer->render($node, array('boolean_item' => false));
+$t->unlike($query, '/WHERE TRUE/', 'false is disable if-block');
+
+// numeric
+list($query, $_) = $renderer->render($node, array('boolean_item' => 1));
+$t->like($query, '/WHERE TRUE/', '1 is enable if-block');
+
+list($query, $_) = $renderer->render($node, array('boolean_item' => -1));
+$t->like($query, '/WHERE TRUE/', '-1 is enable if-block');
+
+list($query, $_) = $renderer->render($node, array('boolean_item' => 0));
+$t->unlike($query, '/WHERE TRUE/', '0 is disable if-block');
+
+// string
+list($query, $_) = $renderer->render($node, array('boolean_item' => 'some string'));
+$t->like($query, '/WHERE TRUE/', '"some string" is enable if-block');
+
+list($query, $_) = $renderer->render($node, array('boolean_item' => ''));
+$t->unlike($query, '/WHERE TRUE/', '"" is disable if-block');
+
+// array
+list($query, $_) = $renderer->render($node, array('boolean_item' => array(1, 2, 3)));
+$t->like($query, '/WHERE TRUE/', 'array(1, 2, 3) is enable if-block');
+
+list($query, $_) = $renderer->render($node, array('boolean_item' => array()));
+$t->unlike($query, '/WHERE TRUE/', 'array() is disable if-block');
