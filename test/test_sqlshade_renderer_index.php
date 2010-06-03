@@ -154,3 +154,90 @@ $t->like($query, '/WHERE TRUE/', 'array(1, 2, 3) is enable if-block');
 
 list($query, $_) = $renderer->render($node, array('boolean_item' => array()));
 $t->unlike($query, '/WHERE TRUE/', 'array() is disable if-block');
+
+// @test
+$templateName = 'test_for_scalar.sql';
+$node = new SQLShade_Node_Module(
+    new SQLShade_Node_Compound(
+        array(
+            new SQLShade_Node_For(
+                new SQLShade_Node_Expression_AssignName('keyword', 1),
+                new SQLShade_Node_Expression_Name('keywords', 1),
+                new SQLShade_Node_Compound(
+                    array(
+                        new SQLShade_Node_Literal("AND desc LIKE '%' || ", 1),
+                        new SQLShade_Node_Substitute(
+                            new SQLShade_Node_Expression_Name('keyword', 1),
+                            '123456', 1),
+                        new SQLShade_Node_Literal(" || '%' ", 1),
+                        ),
+                    1),
+                1),
+            ),
+        1),
+    $templateName);
+list($query, $bound) = $renderer->render($node, array('keywords' => array('mc', 'mos', "denny's")));
+$t->is($query, str_repeat("AND desc LIKE '%' || ? || '%' ", 3), '3 loops per scalar values');
+$t->is($bound, array('mc', 'mos', "denny's"));
+
+// @test
+$templateName = 'test_for_list.sql';
+$node = new SQLShade_Node_Module(
+    new SQLShade_Node_Compound(
+        array(
+            new SQLShade_Node_For(
+                new SQLShade_Node_Expression_AssignName('and_kws', 1),
+                new SQLShade_Node_Expression_Name('keywords', 1),
+                new SQLShade_Node_Compound(
+                    array(
+                        new SQLShade_Node_Literal("OR desc IN '%' || ", 1),
+                        new SQLShade_Node_Substitute(
+                            new SQLShade_Node_Expression_Name('and_kws', 1),
+                            '123456', 1),
+                        new SQLShade_Node_Literal(" || '%' ", 1),
+                        ),
+                    1),
+                1),
+            ),
+        1),
+    $templateName);
+list($query, $bound) = $renderer->render(
+    $node, array('keywords' => array(array(1, 2), array(3, 4), array(5, 6))));
+$t->is($query, str_repeat("OR desc IN '%' || (?, ?) || '%' ", 3), '3 loops per list values');
+$t->is($bound, array(1, 2, 3, 4, 5, 6));
+
+// @test
+$templateName = 'test_for_named_iteration.sql';
+$node = new SQLShade_Node_Module(
+    new SQLShade_Node_Compound(
+        array(
+            new SQLShade_Node_For(
+                new SQLShade_Node_Expression_AssignName('iteritem', 1),
+                new SQLShade_Node_Expression_Name('iterate_values', 1),
+                new SQLShade_Node_Compound(
+                    array(
+                        new SQLShade_Node_Literal(' OR (ident = ', 1),
+                        new SQLShade_Node_Substitute(
+                            new SQLShade_Node_Expression_Name('iteritem.ident', 1), 9999, 1),
+                        new SQLShade_Node_Literal(' AND password = ', 1),
+                        new SQLShade_Node_Substitute(
+                            new SQLShade_Node_Expression_Name('iteritem.password', 1), 'test_pass', 1),
+                        new SQLShade_Node_Literal(' AND status IN ', 1),
+                        new SQLShade_Node_Substitute(
+                            new SQLShade_Node_Expression_Name('iteritem.status', 1), '(1, 2, 3)', 1),
+                        new SQLShade_Node_Literal(')', 1),
+                        ),
+                    1),
+                1),
+            ),
+        1),
+    $templateName);
+$context = array(
+    'iterate_values' => array(
+        array('ident' => 1105, 'password' => 'kjim_pass', 'status' => array(1, 2)),
+        array('ident' => 3259, 'password' => 'anon_pass', 'status' => array(1, 3)),
+        ),
+    );
+list($query, $bound) = $renderer->render($node, $context);
+$t->is($query, str_repeat(" OR (ident = ? AND password = ? AND status IN (?, ?))", 2), '2 loops');
+$t->is($bound, array(1105, 'kjim_pass', 1, 2, 3259, 'anon_pass', 1, 3), '2 loops bound variables are co');

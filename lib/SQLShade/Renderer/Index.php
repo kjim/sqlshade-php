@@ -17,7 +17,7 @@ class SQLShade_Renderer_Index {
         $printer = new SQLShade_Printer_Index();
         $context = array(
             'printer' => $printer,
-            'context' => is_array($data) ? new SQLShade_RenderContext($data) : $data,
+            'context' => (is_array($data) ? new SQLShade_RenderContext($data) : $data),
             );
         $this->traverse($node->getBody(), $context);
         return $printer->freeze();
@@ -131,6 +131,28 @@ class SQLShade_Renderer_Index {
     }
 
     public function visitFor($node, &$ctx) {
+        $context = $ctx['context'];
+        $ident = $node->getIdent()->getName();
+        try {
+            $sequence = $context->data[$ident];
+        } catch (SQLShade_KeyError $e) {
+            if ($this->strict) {
+                throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+            }
+            return;
+        }
+        $alias = $node->getItem()->getName();
+        $this->writeFor($node, $ctx, $alias, $sequence);
+    }
+
+    protected function writeFor($node, &$ctx, &$alias, &$sequence) {
+        $forBlockContext = clone $ctx['context'];
+        $forBlockCtx = $ctx;
+        $forBlockCtx['context'] = $forBlockContext;
+        foreach ($sequence as $idata) {
+            $forBlockContext->data->update(array((string) $alias => $idata));
+            $this->traverse($node, $forBlockCtx);
+        }
     }
 
 }
