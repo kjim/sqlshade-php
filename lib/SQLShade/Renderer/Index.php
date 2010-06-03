@@ -55,12 +55,10 @@ class SQLShade_Renderer_Index {
             if (count($variable) === 0) {
                 throw new SQLShade_RenderError('Binding data should not be empty');
             }
-            $l = array();
+            $printer->write('(' . implode(', ', array_fill(0, count($variable), '?')) . ')');
             foreach ($variable as &$v) {
                 $printer->bind($v);
-                $l[] = '?';
             }
-            $printer->write('(' . implode(', ', $l) . ')');
         }
         else {
             $printer->write('?');
