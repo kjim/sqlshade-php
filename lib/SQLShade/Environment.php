@@ -11,6 +11,7 @@ class SQLShade_Environment {
     protected $parser;
     protected $parsers;
     protected $extensions;
+    protected $renderers;
 
     public function __construct($options = array()) {
         $lexoptions = array(
@@ -52,19 +53,6 @@ class SQLShade_Environment {
         return $this->getParser()->parse($tokens);
     }
 
-    public function getRenderer() {
-        return $this->renderer;
-    }
-
-    public function setRenderer($renderer) {
-        $this->renderer = $renderer;
-        $renderer->setEnvironment($this);
-    }
-
-    public function render($node) {
-        return $this->getRenderer()->render($node);
-    }
-
     public function compileSource($source, $name) {
         return $this->parse($this->tokenize($source, $name));
     }
@@ -82,6 +70,17 @@ class SQLShade_Environment {
         }
 
         return $this->parsers;
+    }
+
+    public function getRendererClass($parameterFormat) {
+        if ($this->renderers === null) {
+            $this->renderers = array();
+            foreach ($this->getExtensions() as $ext) {
+                $this->renderers = array_merge($this->renderers, $ext->getRendererClasses());
+            }
+        }
+
+        return $this->renderers[$parameterFormat];
     }
 
     public function getTemplateClass($filename) {

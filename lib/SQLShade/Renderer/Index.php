@@ -8,9 +8,9 @@ class SQLShade_Renderer_Index {
     protected $env;
     protected $strict;
 
-    public function __construct($env) {
+    public function __construct($env, $strict = true) {
         $this->env = $env;
-        $this->strict = true;
+        $this->strict = $strict;
     }
 
     public function render(/*Node_Module*/$node, $data = array()) {

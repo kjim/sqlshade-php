@@ -1,19 +1,40 @@
 <?php
+require_once(dirname(__FILE__).'/Environment.php');
 
 class SQLShade_Template {
 
+    static protected $defaultEnvironment;
+
     protected $name;
+    protected $node;
+    protected $renderer;
 
-    public function __construct($name) {
-        $this->name = $name;
+    public function __construct($source, $options = array()) {
+        $options = array_merge(
+            array('strict' => true,
+                  'parameter_format' => 'list',
+                  'env' => self::getDefaultEnvironment(),
+                  'name' => 'n/a',
+                ));
+
+        $env = $options['env'];
+        $cls = $env->getRendererClass($options['parameter_format']);
+        $this->renderer = new $cls($env, $options['strict']);
+
+        $this->name = $options['name'];
+        $this->node = $env->compileSource($source, $this->name);
     }
 
-    public function render($context) {
-        // FIXME: render implementation
+    public function render($context = array()) {
+        return $this->renderer->render($this->node, $context);
     }
 
-    protected function getName() {
-        return $name;
+    static protected function getDefaultEnvironment() {
+        if (self::$defaultEnvironment === null) {
+            self::$defaultEnvironment = new SQLShade_Environment();
+        }
+
+        return self::$defaultEnvironment;
     }
 
 }
