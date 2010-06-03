@@ -8,7 +8,7 @@ class SQLShade_RenderContext {
 
     public function __construct($data, $env = array()) {
         $this->data = new SQLShade_RenderContext_InnerArray($data);
-        $this->env =& $env;
+        $this->env = $env;
     }
 
     public function __clone() {
@@ -22,8 +22,8 @@ class SQLShade_RenderContext_InnerArray implements ArrayAccess {
 
     protected $source;
 
-    public function __construct(&$source) {
-        $this->source =& $source;
+    public function __construct($source) {
+        $this->source = $source;
     }
 
     public function update($data) {

@@ -11,7 +11,7 @@ $env = new SQLShade_Environment();
 $renderer = new SQLShade_Renderer_Index($env);
 
 // @test
-$templateName = 'template_1.sql';
+$templateName = 'test_literal.sql';
 $node = new SQLShade_Node_Module(
     new SQLShade_Node_Compound(
         array(
@@ -24,7 +24,7 @@ $t->is($query, 'SELECT * FROM t_table;', 'generates query for prepare');
 $t->is($bound, array(), 'bound variables are empty');
 
 // @test
-$templateName = 'template_2.sql';
+$templateName = 'test_substitute.sql';
 $node = new SQLShade_Node_Module(
     new SQLShade_Node_Compound(
         array(
@@ -46,3 +46,27 @@ try {
 } catch (SQLShade_RenderError $e) {
     $t->pass('raise error if not pass parameter in context');
 }
+
+// @test
+$templateName = 'test_embed.sql';
+$node = new SQLShade_Node_Module(
+    new SQLShade_Node_Compound(
+        array(
+            new SQLShade_Node_Literal('SELECT * FROM ', 1),
+            new SQLShade_Node_Embed(
+                new SQLShade_Node_Expression_Name('table', 1),
+                new SQLShade_Node_Compound(
+                    array(
+                        new SQLShade_Node_Literal('t_table', 1),
+                        ),
+                    1),
+                1),
+            new SQLShade_Node_Literal(';', 1),
+            ),
+        1),
+    $templateName);
+list($query, $bound) = $renderer->render($node, array('table' => 't_table_extension'));
+$t->is($query, 'SELECT * FROM t_table_extension;', 'embed t_table_extension');
+
+list($query, $bound) = $renderer->render($node, array('table' => 't_table_test'));
+$t->is($query, 'SELECT * FROM t_table_test;', 'embed t_table_test');

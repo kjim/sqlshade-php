@@ -44,9 +44,6 @@ class SQLShade_Renderer_Index {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $ident);
             }
-            else {
-                $ctx['printer']->write("/*:{$ident}*/$text");
-            }
             return;
         }
         $this->writeSubstitute($node, $ctx, $variable);
@@ -72,6 +69,20 @@ class SQLShade_Renderer_Index {
     }
 
     public function visitEmbed($node, &$ctx) {
+        $context = $ctx['context'];
+        $ident = $node->getIdent()->getName();
+        try {
+            $variable = $context->data[$ident];
+        } catch (SQLShade_KeyError $e) {
+            if ($this->strict) {
+                throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+            }
+        }
+        $this->writeEmbed($node, $ctx, $variable);
+    }
+
+    protected function writeEmbed($node, &$ctx, &$variable) {
+        $ctx['printer']->write($variable);
     }
 
     public function visitEval($node, &$ctx) {
