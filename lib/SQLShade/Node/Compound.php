@@ -5,8 +5,8 @@ class SQLShade_Node_Compound extends SQLShade_Node {
 
     protected $nodes;
 
-    public function __construct(array $nodes, $lineno = 0) {
-        parent::__construct($lineno);
+    public function __construct(array $nodes, $lineno = 0, $token = null) {
+        parent::__construct($lineno, $token);
 
         $this->nodes = $nodes;
     }

@@ -6,8 +6,8 @@ class SQLShade_Node_Substitute extends SQLShade_Node {
     protected $expr;
     protected $faketext;
 
-    public function __construct($expr, $faketext, $lineno) {
-        parent::__construct($lineno);
+    public function __construct($expr, $faketext, $lineno, $token) {
+        parent::__construct($lineno, $token);
 
         $this->expr = $expr;
         $this->faketext = $faketext;

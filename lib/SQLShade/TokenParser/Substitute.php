@@ -28,11 +28,17 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         return new SQLShade_Node_Substitute($expr, $faketext, $lineno);
     }
 
+    public function deparse($node) {
+        $tokens = array();
+        $tokens[] = new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', $node->getLine());
+        $tokens[] = new SQLShade_Token(SQLShade_To);
+    }
+
     public function _parseFaketext($text, $lineno) {
         if (is_null($text) || strlen($text) <= 0) {
             return ''; // return empty string
         }
-
+        
         $charRules = SQLShade_TokenParser_Substitute::$SOULD_BE_END_CHAR_RULES;
         $firstChar = $text[0];
         $shouldBeEndChar = isset($charRules[$firstChar]) ? $charRules[$firstChar] : null;
