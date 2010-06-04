@@ -39,7 +39,7 @@ class SQLShade_Token
     }
 
     /**
-     * Test the current token for a type.  The first argument is the type
+ 7    * Test the current token for a type.  The first argument is the type
      * of the token (if not given SQLShade_Token::NAME_TYPE), the second the
      * value of the token (if not given value is not checked).
      * the token value can be an array if multiple checks should be

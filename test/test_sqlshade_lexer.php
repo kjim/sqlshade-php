@@ -134,3 +134,43 @@ try {
 catch (SQLShade_SyntaxError $e) {
   $t->pass('no more token');
 }
+
+//
+function test_streamtype_order($t, $tokenstream, $expected, $msg = 'test streamtype order') {
+    $tokentypes = array();
+    try {
+        while (($token = $tokenstream->next())) {
+            $tokentypes[] = array($token->getType(), $token->getValue());
+        }
+    } catch (SQLShade_SyntaxError $e) {
+        // end of stream
+    }
+    $t->is_deeply($tokentypes, $expected, $msg);
+}
+
+// @test
+test_streamtype_order($t, $lexer->tokenize("/*:item.name*/"),
+                      array(array(SQLShade_Token::VAR_START_TYPE, ''),
+                            array(SQLShade_Token::NAME_TYPE, 'item'),
+                            array(SQLShade_Token::OPERATOR_TYPE, '.'),
+                            array(SQLShade_Token::NAME_TYPE, 'name'),
+                            array(SQLShade_Token::VAR_END_TYPE, ''),
+                          ));
+// @test
+test_streamtype_order($t, $lexer->tokenize("/*:item['name']*/"),
+                      array(array(SQLShade_Token::VAR_START_TYPE, ''),
+                            array(SQLShade_Token::NAME_TYPE, 'item'),
+                            array(SQLShade_Token::OPERATOR_TYPE, '['),
+                            array(SQLShade_Token::STRING_TYPE, 'name'),
+                            array(SQLShade_Token::OPERATOR_TYPE, ']'),
+                            array(SQLShade_Token::VAR_END_TYPE, ''),
+                          ));
+// @test
+test_streamtype_order($t, $lexer->tokenize('/*:item["name"]*/'),
+                      array(array(SQLShade_Token::VAR_START_TYPE, ''),
+                            array(SQLShade_Token::NAME_TYPE, 'item'),
+                            array(SQLShade_Token::OPERATOR_TYPE, '['),
+                            array(SQLShade_Token::STRING_TYPE, 'name'),
+                            array(SQLShade_Token::OPERATOR_TYPE, ']'),
+                            array(SQLShade_Token::VAR_END_TYPE, ''),
+                          ));
