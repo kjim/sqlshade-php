@@ -3,11 +3,9 @@ require_once(dirname(__FILE__).'/Error.php');
 
 class SQLShade_SyntaxError extends SQLShade_Error {
 
-    protected
-        $message,
-        $lineno,
-        $filename
-        ;
+    protected $message;
+    protected $lineno;
+    protected $filename;
 
     public function __construct($message, $lineno, $filename = null) {
         $this->message = $message;
@@ -15,6 +13,14 @@ class SQLShade_SyntaxError extends SQLShade_Error {
         $this->filename = $filename;
 
         parent::__construct($message.self::formatLineno($lineno, $filename), $lineno);
+    }
+
+    public function getFilename() {
+        return $this->filename;
+    }
+
+    public function setFilename($filename) {
+        $this->filename = $filename;
     }
 
     static protected function formatLineno($lineno, $filename) {

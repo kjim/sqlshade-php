@@ -160,3 +160,56 @@ $t->is($query, "SELECT * FROM t_member
         AND t_member.nickname ILIKE 'linus'
     ;", "embed works are SQL injection");
 $t->is($bound, $parameters['member_ids']);
+
+// @test
+$plainQuery = "SELECT * FROM t_member
+    WHERE TRUE
+        /*#for nickname in nicknames*/
+        AND (t_member.nickname = /*:nickname*/'')
+        AND (t_member.nickname LIKE /*:nickname_global_cond*/'%')
+        /*#endfor*/
+    ;";
+$parameters = array('nicknames' => array('kjim', 'keiji'), 'nickname_global_cond' => 'openbooth');
+
+$template = new SQLShade_Template($plainQuery);
+list($query, $bound) = $template->render($parameters);
+$t->is($query, "SELECT * FROM t_member
+    WHERE TRUE
+        
+        AND (t_member.nickname = ?)
+        AND (t_member.nickname LIKE ?)
+        
+        AND (t_member.nickname = ?)
+        AND (t_member.nickname LIKE ?)
+        
+    ;", "2 loops");
+$t->is($bound, array('kjim', 'openbooth', 'keiji', 'openbooth'), 'for block context');
+
+// @test
+$plainQuery = "SELECT * FROM t_member
+    WHERE TRUE
+        /*#for item in nickname_items*/
+        AND (t_member.firstname = /*:item.firstname*/'keiji')
+        AND (t_member.lastname = /*:item.lastname*/'muraishi')
+        /*#endfor*/
+    ;";
+$parameters = array(
+    'nickname_items' => array(
+        array('firstname' => 'keiji', 'lastname' => 'muraishi'),
+        array('firstname' => 'typez', 'lastname' => 'vaio'),
+        ),
+    );
+
+$template = new SQLShade_Template($plainQuery);
+list($query, $bound) = $template->render($parameters);
+$t->is($query, "SELECT * FROM t_member
+    WHERE TRUE
+        
+        AND (t_member.firstname = ?)
+        AND (t_member.lastname = ?)
+        
+        AND (t_member.firstname = ?)
+        AND (t_member.lastname = ?)
+        
+    ;", "iterate items are type of object(array). dot access is available");
+$t->is($bound, array('kjim', 'openbooth', 'keiji', 'openbooth'), 'for block context');
