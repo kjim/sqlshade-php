@@ -39,14 +39,14 @@ $tokenparser = new SQLShade_TokenParser_For();
 $tokenparser->setParser($driveparser);
 
 $node = $tokenparser->parse($token);
-$t->ok($node instanceof SQLShade_Node_For,
+$t->isa_ok($node, "SQLShade_Node_For",
        'SQLShade_TokenParser_For generates instance of SQLShade_Node_For');
 
-$t->ok($node->getItem() instanceof SQLShade_Node_Expression_AssignName,
+$t->isa_ok($node->getItem(), "SQLShade_Node_Expression_AssignName",
        'getItem() returns instance of SQLShade_Node_Expression_AssignName');
-$t->ok($node->getIdent() instanceof SQLShade_Node_Expression_Name,
+$t->isa_ok($node->getIdent(), "SQLShade_Node_Expression_Name",
        'getIdent() returns instance of SQLShade_Node_Expression_Name');
 
 $nodes = $node->getChildren();
 $t->is(count($nodes), 1);
-$t->ok($nodes[0] instanceof SQLShade_Node_Literal);
+$t->isa_ok($nodes[0], "SQLShade_Node_Literal");
