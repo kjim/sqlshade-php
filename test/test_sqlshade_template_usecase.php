@@ -55,4 +55,19 @@ $parameters = array(
     );
 
 list($query, $bound) = $template->render($parameters);
-$t->unlike($query, '/AS self_favorite_data/', 'disable join_self_favorite_data block');
+$t->unlike($query, '/AS self_favorite_data/', 'disable join_self_favorite_data block: AS self_favorite_data');
+$t->unlike($query, '/LEFT OUTER JOIN/', 'disable join_self_favorite_data block: LEFT OUTER JOIN');
+$t->is_deeply($bound, array(1, 3245, 3857, 1), 'bound correct variables');
+
+// @test
+$parameters = array(
+    'join_self_favorite_data'=> true,
+    'self_userid' => 3586,
+    'favorite_ids' => array(11, 3245, 3857),
+    'status_activated' => 1,
+    );
+
+list($query, $bound) = $template->render($parameters);
+$t->like($query, '/AS self_favorite_data/', 'enable join_self_favorite_data block: AS self_favorite_data');
+$t->like($query, '/LEFT OUTER JOIN/', 'enable join_self_favorite_data block: LEFT OUTER JOIN');
+$t->is_deeply($bound, array(3586, 1, 11, 3245, 3857, 1), 'bound correct variables');
