@@ -85,12 +85,12 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
                 $escape = false;
             }
 
-            if ($stack === 0 && $string === false && in_array($c, $end) && $i > 0) {
+            if ($stack <= 0 && $string === false && in_array($c, $end) && $i > 0) {
                 return $i + $offset;
             }
         }
 
-        if ($stack === 0 && $string === false && !in_array($c, $end)) {
+        if ($stack <= 0 && $string === false && !in_array($c, $end)) {
             return $lastindex + 1;
         }
         else {
