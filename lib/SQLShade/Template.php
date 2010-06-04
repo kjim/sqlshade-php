@@ -15,7 +15,7 @@ class SQLShade_Template {
                   'parameter_format' => 'list',
                   'env' => self::getDefaultEnvironment(),
                   'name' => 'n/a',
-                ));
+                ), $options);
 
         $env = $options['env'];
         $cls = $env->getRendererClass($options['parameter_format']);

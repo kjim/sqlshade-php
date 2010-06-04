@@ -71,3 +71,34 @@ list($query, $bound) = $template->render($parameters);
 $t->like($query, '/AS self_favorite_data/', 'enable join_self_favorite_data block: AS self_favorite_data');
 $t->like($query, '/LEFT OUTER JOIN/', 'enable join_self_favorite_data block: LEFT OUTER JOIN');
 $t->is_deeply($bound, array(3586, 1, 11, 3245, 3857, 1), 'bound correct variables');
+
+
+// @setup
+$exectableWhereClauseQuery = "
+    /*#if false*/
+    SELECT * FROM t_favorite WHERE TRUE
+    /*#endif*/
+        /*#if use_condition_keyword*/
+        AND (FALSE
+            /*#for keyword in keywords*/
+            OR UPPER(t_favorite.remarks) LIKE UPPER('%' || /*:keyword*/'' || '%')
+            /*#endfor*/
+        )
+        /*#endif*/
+        /*#if use_condition_fetch_status*/
+        AND t_favorite.status IN /*:fetch_status*/(1, 100)
+        /*#endif*/
+        /*#if use_condition_sector*/
+        AND t_favorite.record_type EXISTS (
+            SELECT 1 FROM /*#embed sector_table*/t_sector_AA/*#endembed*/
+        )
+        /*#endif*/
+        AND t_favorite.status = /*:status_activated*/1
+    /*#if false*/
+    ;
+    /*#endif*/
+";
+
+// @test
+$tempalteWhereClause = new SQLShade_Template($exectableWhereClauseQuery, array('strict' => false));
+list($tmpQuery, $_) = $tempalteWhereClause->render(array('false' => false));
