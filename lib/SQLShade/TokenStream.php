@@ -19,7 +19,7 @@ class SQLShade_TokenStream
     protected $filename;
     protected $trimBlocks;
 
-    public function __construct(array $tokens, $filename, $trimBlocks = true)
+    public function __construct(array $tokens, $filename, $trimBlocks = false)
     {
         $this->pushed = array();
         $this->originalTokens = $tokens;
@@ -156,5 +156,9 @@ class SQLShade_TokenStream
     public function getFilename()
     {
         return $this->filename;
+    }
+
+    public function setTrimBlocks(boolean $trimBlocks) {
+        $this->trimBlocks = $trimBlocks;
     }
 }
