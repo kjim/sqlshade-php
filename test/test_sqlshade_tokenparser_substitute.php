@@ -32,9 +32,9 @@ $node = $tokenparser->parse($token);
 $t->isa_ok($node, "SQLShade_Node_Substitute",
        'return node is instance of SQLShade_Node_Substitute');
 
-$t->isa_ok($node->getIdent(), "SQLShade_Node_Expression_Name",
-       'getIdent() return value is instance of SQLShade_Node_Expression_Name');
-$t->is($node->getIdent()->getName(), 'item');
+$t->isa_ok($node->getExpr(), "SQLShade_Node_Expression_Name",
+       'getExpr() return value is instance of SQLShade_Node_Expression_Name');
+$t->is($node->getExpr()->getName(), 'item');
 $t->is($node->getFaketext(), "'faketext'", "faketext is 'faketext'");
 
 $token = $stream1->getCurrent();

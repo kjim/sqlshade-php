@@ -72,7 +72,7 @@ $t->is(count($ifnodes), 3);
 $t->ok($ifnodes[0] instanceof SQLShade_Node_Literal);
 $t->is($ifnodes[0]->getLiteral(), 'AND t_table.uid = ');
 $t->ok($ifnodes[1] instanceof SQLShade_Node_Substitute);
-$t->is($ifnodes[1]->getIdent()->getName(), 'uid');
+$t->is($ifnodes[1]->getExpr()->getName(), 'uid');
 $t->is($ifnodes[1]->getFaketext(), '832958');
 
 // test 4th node

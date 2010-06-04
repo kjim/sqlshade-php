@@ -3,18 +3,18 @@ require_once(dirname(__FILE__).'/../Node.php');
 
 class SQLShade_Node_Substitute extends SQLShade_Node {
 
-    protected $ident;
+    protected $expr;
     protected $faketext;
 
-    public function __construct($ident, $faketext, $lineno) {
+    public function __construct($expr, $faketext, $lineno) {
         parent::__construct($lineno);
 
-        $this->ident = $ident;
+        $this->expr = $expr;
         $this->faketext = $faketext;
     }
 
-    public function getIdent() {
-        return $this->ident;
+    public function getExpr() {
+        return $this->expr;
     }
 
     public function getFaketext() {

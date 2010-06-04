@@ -57,12 +57,12 @@ class SQLShade_Renderer_Index {
 
     public function visitSubstitute($node, &$ctx) {
         $context = $ctx['context'];
-        $ident = $node->getIdent();
+        $expr = $node->getExpr();
         try {
-            $variable = $this->getAttribute($ident, $context);
+            $variable = $this->getAttribute($expr, $context);
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
-                throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+                throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
             return;
         }
