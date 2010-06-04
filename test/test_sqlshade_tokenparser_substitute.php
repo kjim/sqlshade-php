@@ -29,10 +29,10 @@ $token = $stream1->next(); // item
 $driveparser->setStream($stream1);
 
 $node = $tokenparser->parse($token);
-$t->ok($node instanceof SQLShade_Node_Substitute,
+$t->isa_ok($node, "SQLShade_Node_Substitute",
        'return node is instance of SQLShade_Node_Substitute');
 
-$t->ok($node->getIdent() instanceof SQLShade_Node_Expression_Name,
+$t->isa_ok($node->getIdent(), "SQLShade_Node_Expression_Name",
        'getIdent() return value is instance of SQLShade_Node_Expression_Name');
 $t->is($node->getIdent()->getName(), 'item');
 $t->is($node->getFaketext(), "'faketext'", "faketext is 'faketext'");
@@ -56,11 +56,28 @@ $token = $stream2->next();
 $driveparser->setStream($stream2);
 
 $node = $tokenparser->parse($token);
-$t->ok($node instanceof Sqlshade_Node_Substitute);
+$t->isa_ok($node, "SQLShade_Node_Substitute");
 $t->is($node->getFaketext(), "123456", "faketext is 123456");
 
 $token = $stream2->getCurrent();
 $t->is($token->getValue(), ' AND ...', "getValue() return value has no literal 123456");
+
+// @test
+$stream = new SQLShade_TokenStream(
+    array(
+        new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'item', 1),
+        new SQLShade_Token(SQLShade_Token::OPERATOR_TYPE, '.', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'name', 1),
+        new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::TEXT_TYPE, "TRUE AND ...", 1),
+        ),
+    '');
+$token = $stream->next(); // skip var start
+$driveparser->setStream($stream);
+
+$node = $tokenparser->parse($token);
+$t->isa_ok($node, "SQLShade_Node_Substitute");
 
 // @test
 $shouldBeCloseParen = ")";

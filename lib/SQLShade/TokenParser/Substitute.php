@@ -14,10 +14,7 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
     public function parse(SQLShade_Token $token) {
         $lineno = $token->getLine();
 
-        $token = $this->parser->getCurrentToken();
-        $this->parser->getStream()->expect(SQLShade_Token::NAME_TYPE);
-        $ident = new SQLShade_Node_Expression_Name($token->getValue(), $token->getLine());
-
+        $expr = $this->parser->getExpressionParser()->parsePrimaryExpression();
         $this->parser->getStream()->expect(SQLShade_Token::VAR_END_TYPE);
 
         $token = $this->parser->getCurrentToken();
@@ -28,7 +25,7 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         $tokenvalue = $token->getValue();
         $faketext = $this->_parseFaketext($tokenvalue, $token->getLine());
         $token->setValue(str_replace($faketext, '', $tokenvalue));
-        return new SQLShade_Node_Substitute($ident, $faketext, $lineno);
+        return new SQLShade_Node_Substitute($expr, $faketext, $lineno);
     }
 
     public function _parseFaketext($text, $lineno) {

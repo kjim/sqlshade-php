@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__).'/Token.php');
 require_once(dirname(__FILE__).'/SyntaxError.php');
+require_once(dirname(__FILE__).'/ExpressionParser.php');
 
 require_once(dirname(__FILE__).'/Node/Module.php');
 require_once(dirname(__FILE__).'/Node/Literal.php');
@@ -11,6 +12,7 @@ class SQLShade_Parser {
 
     protected $stream;
     protected $handlers;
+    protected $expressionParser;
     protected $env;
 
     public function __construct($env = null) {
@@ -127,6 +129,14 @@ class SQLShade_Parser {
 
     public function getCurrentToken() {
         return $this->stream->getCurrent();
+    }
+
+    public function getExpressionParser() {
+        if ($this->expressionParser === null) {
+            $this->expressionParser = new SQLShade_ExpressionParser($this);
+        }
+
+        return $this->expressionParser;
     }
 
 }
