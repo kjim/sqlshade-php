@@ -39,7 +39,7 @@ $node = $tokenparser->parse($token);
 $t->isa_ok($node, "SQLShade_Node_If",
        'SQLShade_TokenParser_If generates instance of SQLShade_Node_If');
 
-$t->isa_ok($node->getIdent(), "SQLShade_Node_Expression_Name");
+$t->isa_ok($node->getExpr(), "SQLShade_Node_Expression_Name");
 $nodes = $node->getChildren();
 $t->is(count($nodes), 1);
 $t->isa_ok($nodes[0], "SQLShade_Node_Literal");
@@ -70,6 +70,6 @@ $driveparser->setStream($stream);
 $node = $tokenparser->parse($ifToken);
 $t->isa_ok($node, "SQLShade_Node_If",
        'SQLShade_TokenParser_If generates instance of SQLShade_Node_If');
-$t->isa_ok($node->getIdent(), "SQLShade_Node_Expression_Unary_Not");
-$t->isa_ok($node->getIdent()->getNode(), "SQLShade_Node_Expression_Name");
-$t->is($node->getIdent()->getNode()->getName(), "item");
+$t->isa_ok($node->getExpr(), "SQLShade_Node_Expression_Unary_Not");
+$t->isa_ok($node->getExpr()->getNode(), "SQLShade_Node_Expression_Name");
+$t->is($node->getExpr()->getNode()->getName(), "item");

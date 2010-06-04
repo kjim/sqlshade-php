@@ -29,6 +29,27 @@ class SQLShade_Renderer_Index {
         }
     }
 
+    protected function toAttributeAccessKey($node) {
+        $nodetype = get_class($node);
+        if ($nodetype === 'SQLShade_Node_Expression_Name') {
+            return $node->getName();
+        }
+        elseif ($nodetype === 'SQLShade_Node_Expression_Constant') {
+            return $node->getValue();
+        }
+        elseif ($nodetype === 'SQLShade_Node_Expression_AttrName') {
+            $left = $this->toAttributeAccessKey($node->getNode());
+            $right = $this->toAttributeAccessKey($node->getAttr());
+            return $left . '.' . $right;
+        }
+
+        throw new LogicException("Unexpected node type: " . $nodetype);
+    }
+
+    protected function getAttribute($node, $context) {
+        return $context->data[$this->toAttributeAccessKey($node)];
+    }
+
     public function visitLiteral($node, &$ctx) {
         $printer = $ctx['printer'];
         $printer->write($node->getLiteral());
@@ -36,10 +57,9 @@ class SQLShade_Renderer_Index {
 
     public function visitSubstitute($node, &$ctx) {
         $context = $ctx['context'];
-        $ident = $node->getIdent()->getName();
-        $text = $node->getFaketext();
+        $ident = $node->getIdent();
         try {
-            $variable = $context->data[$ident];
+            $variable = $this->getAttribute($ident, $context);
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $ident);
@@ -68,12 +88,12 @@ class SQLShade_Renderer_Index {
 
     public function visitEmbed($node, &$ctx) {
         $context = $ctx['context'];
-        $ident = $node->getIdent()->getName();
+        $expr = $node->getExpr();
         try {
-            $variable = $context->data[$ident];
+            $variable = $this->getAttribute($expr, $context);
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
-                throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+                throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
         }
         $this->writeEmbed($node, $ctx, $variable);
@@ -85,12 +105,12 @@ class SQLShade_Renderer_Index {
 
     public function visitEval($node, &$ctx) {
         $context = $ctx['context'];
-        $ident = $node->getIdent()->getName();
+        $expr = $node->getExpr();
         try {
-            $source = $context->data[$ident];
+            $source = $this->getAttribute($expr, $context);
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
-                throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+                throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
             return;
         }
@@ -110,12 +130,12 @@ class SQLShade_Renderer_Index {
 
     public function visitIf($node, &$ctx) {
         $context = $ctx['context'];
-        $ident = $node->getIdent()->getName();
+        $expr = $node->getExpr();
         try {
-            $variable = $context->data[$ident];
+            $variable = $this->getAttribute($expr, $context);
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
-                throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+                throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
             return;
         }
@@ -130,9 +150,9 @@ class SQLShade_Renderer_Index {
 
     public function visitFor($node, &$ctx) {
         $context = $ctx['context'];
-        $ident = $node->getIdent()->getName();
+        $ident = $node->getIdent();
         try {
-            $sequence = $context->data[$ident];
+            $sequence = $this->getAttribute($ident, $context);
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $ident);

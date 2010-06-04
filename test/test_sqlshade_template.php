@@ -212,4 +212,4 @@ $t->is($query, "SELECT * FROM t_member
         AND (t_member.lastname = ?)
         
     ;", "iterate items are type of object(array). dot access is available");
-$t->is($bound, array('kjim', 'openbooth', 'keiji', 'openbooth'), 'for block context');
+$t->is($bound, array('keiji', 'muraishi', 'typez', 'vaio'), 'for block context');

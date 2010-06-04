@@ -3,18 +3,18 @@ require_once(dirname(__FILE__).'/../Node.php');
 
 class SQLShade_Node_If extends SQLShade_Node {
 
-    protected $ident;
+    protected $expr;
     protected $body;
 
-    public function __construct($ident, /*Node_Compound*/$body, $lineno) {
+    public function __construct($expr, /*Node_Compound*/$body, $lineno) {
         parent::__construct($lineno);
 
-        $this->ident = $ident;
+        $this->expr = $expr;
         $this->body = $body;
     }
 
-    public function getIdent() {
-        return $this->ident;
+    public function getExpr() {
+        return $this->expr;
     }
 
     public function getChildren() {
