@@ -9,6 +9,9 @@ $t = new lime_test();
 
 // @setup
 $env = new SQLShade_Environment();
+$driveparser = new SQLShade_Parser($env);
+$tokenparser = new SQLShade_TokenParser_If();
+$tokenparser->setParser($driveparser);
 
 // @test
 $stream = new SQLShade_TokenStream(
@@ -30,17 +33,43 @@ $stream = new SQLShade_TokenStream(
     );
 $token = $stream->next(); // if
 $stream->next();
-
-$driveparser = new SQLShade_Parser($env);
 $driveparser->setStream($stream);
-$tokenparser = new SQLShade_TokenParser_If();
-$tokenparser->setParser($driveparser);
 
 $node = $tokenparser->parse($token);
-$t->ok($node instanceof SQLShade_Node_If,
+$t->isa_ok($node, "SQLShade_Node_If",
        'SQLShade_TokenParser_If generates instance of SQLShade_Node_If');
 
-$t->ok($node->getIdent() instanceof SQLShade_Node_Expression_Name);
+$t->isa_ok($node->getIdent(), "SQLShade_Node_Expression_Name");
 $nodes = $node->getChildren();
 $t->is(count($nodes), 1);
-$t->ok($nodes[0] instanceof SQLShade_Node_Literal);
+$t->isa_ok($nodes[0], "SQLShade_Node_Literal");
+
+// @test
+$stream = new SQLShade_TokenStream(
+    array(
+        new SQLShade_Token(SQLShade_Token::BLOCK_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'if', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'not', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'item', 1),
+        new SQLShade_Token(SQLShade_Token::BLOCK_END_TYPE, '', 1),
+
+        new SQLShade_Token(SQLShade_Token::TEXT_TYPE, 'text here', 1),
+
+        new SQLShade_Token(SQLShade_Token::BLOCK_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'endif', 1),
+        new SQLShade_Token(SQLShade_Token::BLOCK_END_TYPE, '', 1),
+
+        new SQLShade_Token(SQLShade_Token::EOF_TYPE, '', 1),
+        ),
+    'example.sql'
+    );
+$ifToken = $stream->next();
+$stream->next();
+$driveparser->setStream($stream);
+
+$node = $tokenparser->parse($ifToken);
+$t->isa_ok($node, "SQLShade_Node_If",
+       'SQLShade_TokenParser_If generates instance of SQLShade_Node_If');
+$t->isa_ok($node->getIdent(), "SQLShade_Node_Expression_Unary_Not");
+$t->isa_ok($node->getIdent()->getNode(), "SQLShade_Node_Expression_Name");
+$t->is($node->getIdent()->getNode()->getName(), "item");
