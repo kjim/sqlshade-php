@@ -23,6 +23,10 @@ class SQLShade_Node_For extends SQLShade_Node {
         return $this->ident;
     }
 
+    public function getBody() {
+        return $this->body;
+    }
+
     public function getChildren() {
         return $this->body->getChildren();
     }

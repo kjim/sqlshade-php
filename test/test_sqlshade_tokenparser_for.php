@@ -50,3 +50,21 @@ $t->isa_ok($node->getIdent(), "SQLShade_Node_Expression_Name",
 $nodes = $node->getChildren();
 $t->is(count($nodes), 1);
 $t->isa_ok($nodes[0], "SQLShade_Node_Literal");
+
+// @deparse
+$tokens = $tokenparser->deparse($node);
+is_tokens_order($t, $tokens,
+                array(array(SQLShade_Token::BLOCK_START_TYPE, ''),
+                      array(SQLShade_Token::NAME_TYPE, 'for'),
+                      array(SQLShade_Token::NAME_TYPE, 'item'),
+                      array(SQLShade_Token::NAME_TYPE, 'in'),
+                      array(SQLShade_Token::NAME_TYPE, 'items'),
+                      array(SQLShade_Token::BLOCK_END_TYPE, ''),
+
+                      array(SQLShade_Token::TEXT_TYPE, 'text here'),
+
+                      array(SQLShade_Token::BLOCK_START_TYPE, ''),
+                      array(SQLShade_Token::NAME_TYPE, 'endfor'),
+                      array(SQLShade_Token::BLOCK_END_TYPE, ''),
+                    ),
+    'test deparsing');
