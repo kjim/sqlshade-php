@@ -222,6 +222,7 @@ class SQLShade_Renderer_Index {
             else {
                 $ctx['printer']->write($this->serializeNode($node));
             }
+            return;
         }
         $alias = $node->getItem()->getName();
         $this->writeFor($node, $ctx, $alias, $sequence);
