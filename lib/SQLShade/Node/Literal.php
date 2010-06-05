@@ -5,7 +5,7 @@ class SQLShade_Node_Literal extends SQLShade_Node {
 
     protected $literal;
 
-    public function __construct($literal, $lineno, $token) {
+    public function __construct($literal, $lineno, $token = null) {
         parent::__construct($lineno, $token);
 
         $this->literal = $literal;

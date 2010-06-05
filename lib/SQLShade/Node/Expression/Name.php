@@ -5,7 +5,7 @@ class SQLShade_Node_Expression_Name extends SQLShade_Node_Expression {
 
     protected $name;
 
-    public function __construct($name, $lineno, $token) {
+    public function __construct($name, $lineno, $token = null) {
         parent::__construct($lineno, $token);
         $this->name = $name;
     }

@@ -7,8 +7,8 @@ class SQLShade_Node_If extends SQLShade_Node {
     protected $expr;
     protected $body;
 
-    public function __construct($expr, /*Node_Compound*/$body, $lineno, $token) {
-        parent::__construct($lineno, $token);
+    public function __construct($expr, /*Node_Compound*/$body, $lineno) {
+        parent::__construct($lineno, null);
 
         $this->expr = $expr;
         $this->body = $body;

@@ -132,7 +132,7 @@ class SQLShade_Parser {
                 break;
 
             default:
-                $nodename = array_pop(explode("_", $nodetype));
+                $nodename = strtolower(array_pop(explode("_", $nodetype)));
                 if (!isset($this->handlers[$nodename])) {
                     throw new LogicException("Unexpected node type: " . $nodetype);
                 }
