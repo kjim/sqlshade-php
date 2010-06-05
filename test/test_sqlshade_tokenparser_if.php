@@ -86,3 +86,17 @@ $t->isa_ok($node, "SQLShade_Node_If",
 $t->isa_ok($node->getExpr(), "SQLShade_Node_Expression_Unary_Not");
 $t->isa_ok($node->getExpr()->getNode(), "SQLShade_Node_Expression_Name");
 $t->is($node->getExpr()->getNode()->getName(), "item");
+
+// @test deparse
+$tokens = $tokenparser->deparse($node);
+is_tokens_order($t, $tokens,
+                array(array(SQLShade_Token::BLOCK_START_TYPE, ''),
+                      array(SQLShade_Token::NAME_TYPE, 'if'),
+                      array(SQLShade_Token::NAME_TYPE, 'not'),
+                      array(SQLShade_Token::NAME_TYPE, 'item'),
+                      array(SQLShade_Token::BLOCK_END_TYPE, ''),
+                      array(SQLShade_Token::TEXT_TYPE, 'text here'),
+                      array(SQLShade_Token::BLOCK_START_TYPE, ''),
+                      array(SQLShade_Token::NAME_TYPE, 'endif'),
+                      array(SQLShade_Token::BLOCK_END_TYPE, ''),
+                    ));

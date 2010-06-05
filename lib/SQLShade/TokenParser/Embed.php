@@ -9,23 +9,21 @@ class SQLShade_TokenParser_Embed extends SQLShade_TokenParser_If {
     public function parse(/*Token*/$token) {
         $lineno = $token->getLine();
 
-        $token = $this->parser->getCurrentToken();
-        $this->parser->getStream()->expect(SQLShade_Token::NAME_TYPE);
-        $ident = new SQLShade_Node_Expression_Name($token->getValue(), $lineno);
+        $expr = $this->parser->getExpressionParser()->parsePrimaryExpression();
 
         $this->parser->getStream()->expect(SQLShade_Token::BLOCK_END_TYPE);
-        $compound = $this->parser->subparse(array($this, 'decideEmbedEnd'), true);
+        $compound = $this->parser->subparse(array($this, 'decideEnd'), true);
         $this->parser->getStream()->expect(SQLShade_Token::BLOCK_END_TYPE);
 
-        return new SQLShade_Node_Embed($ident, $compound, $lineno);
-    }
-
-    public function decideEmbedEnd($token) {
-        return $token->test('endembed');
+        return new SQLShade_Node_Embed($expr, $compound, $lineno, null);
     }
 
     public function getTag() {
         return 'embed';
+    }
+
+    public function getEndTag() {
+        return 'endembed';
     }
 
 }

@@ -12,7 +12,7 @@ class SQLShade_TokenParser_If extends SQLShade_TokenParser {
         $expr = $this->parser->getExpressionParser()->parseExpression();
 
         $this->parser->getStream()->expect(SQLShade_Token::BLOCK_END_TYPE);
-        $compound = $this->parser->subparse(array($this, 'decideIfEnd'), true);
+        $compound = $this->parser->subparse(array($this, 'decideEnd'), true);
         $this->parser->getStream()->expect(SQLShade_Token::BLOCK_END_TYPE);
 
         return new SQLShade_Node_If($expr, $compound, $lineno, null);
@@ -37,7 +37,7 @@ class SQLShade_TokenParser_If extends SQLShade_TokenParser {
         return $tokens;
     }
 
-    public function decideIfEnd($token) {
+    public function decideEnd($token) {
         return $token->test($this->getEndTag());
     }
 
