@@ -1,3 +1,4 @@
+
 <?php
 require_once(dirname(__FILE__).'/../Node.php');
 
@@ -15,6 +16,10 @@ class SQLShade_Node_If extends SQLShade_Node {
 
     public function getExpr() {
         return $this->expr;
+    }
+
+    public function getBody() {
+        return $this->body;
     }
 
     public function getChildren() {
