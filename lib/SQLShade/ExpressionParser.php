@@ -19,6 +19,34 @@ class SQLShade_ExpressionParser {
         return $this->parseConditionalExpression();
     }
 
+    public function deparseExpression($node) {
+        $nodetype = get_class($node);
+        $tokens = array();
+        switch ($nodetype) {
+            case 'SQLShade_Node_Expression_Unary_Not':
+                $tokens[] = $node->getToken();
+                $tokens = array_merge($tokens, $this->deparseExpression($node->getNode()));
+                break;
+
+            case 'SQLShade_Node_Expression_AttrName':
+                $tokens = array_merge($tokens, $this->deparseExpression($node->getNode()));
+                $tokens[] = new SQLShade_Token(SQLShade_Token::OPERATOR_TYPE, '.', $node->getLine());
+                $tokens = array_merge($tokens, $this->deparseExpression($node->getAttr()));
+                break;
+
+            case 'SQLShade_Node_Expression_Name':
+            case 'SQLShade_Node_Expression_AssignName':
+            case 'SQLShade_Node_Expression_Constant':
+                $tokens[] = $node->getToken();
+                break;
+
+            default:
+                throw new LogicException("Unexpected node type: " . $nodetype);
+        }
+
+        return $tokens;
+    }
+
     public function parseConditionalExpression() {
         $lineno = $this->parser->getCurrentToken()->getLine();
         $expr = $this->parseUnaryExpression();
@@ -37,7 +65,7 @@ class SQLShade_ExpressionParser {
         $token = $this->parser->getStream()->next();
         $node = $this->parseUnaryExpression();
 
-        return new SQLShade_Node_Expression_Unary_Not($node, $token->getLine());
+        return new SQLShade_Node_Expression_Unary_Not($node, $token->getLine(), $token);
     }
 
     public function parsePrimaryExpression($assignment = false) {
@@ -47,20 +75,20 @@ class SQLShade_ExpressionParser {
                 $this->parser->getStream()->next();
                 $value = $token->getValue();
                 if ($value === 'true') {
-                    $node = new SQLShade_Node_Expression_Constant(true, $token->getLine());
+                    $node = new SQLShade_Node_Expression_Constant(true, $token->getLine(), $token);
                 }
                 elseif ($value === 'false') {
-                    $node = new SQLShade_Node_Expression_Constant(false, $token->getLine());
+                    $node = new SQLShade_Node_Expression_Constant(false, $token->getLine(), $token);
                 }
                 else {
                     $cls = $assignment ? 'SQLShade_Node_Expression_AssignName' : 'SQLShade_Node_Expression_Name';
-                    $node = new $cls($token->getValue(), $token->getLine());
+                    $node = new $cls($token->getValue(), $token->getLine(), $token);
                 }
                 break;
 
             case SQLShade_Token::STRING_TYPE:
                 $this->parser->getStream()->next();
-                $node = new SQLShade_Node_Expression_Constant($token->getValue(), $token->getLine());
+                $node = new SQLShade_Node_Expression_Constant($token->getValue(), $token->getLine(), $token);
                 break;
 
             default:
@@ -99,16 +127,16 @@ class SQLShade_ExpressionParser {
         if ($token->getValue() == '.') {
             $token = $this->parser->getStream()->next();
             if ($token->getType() == SQLShade_Token::NAME_TYPE) {
-                $arg = new SQLShade_Node_Expression_Constant($token->getValue(), $lineno);
+                $attr = new SQLShade_Node_Expression_Constant($token->getValue(), $lineno, $token);
             } else {
                 throw new SQLShade_SyntaxError('Expected name or number', $lineno);
             }
         } else {
-            $arg = $this->parseExpression();
+            $attr = $this->parseExpression();
             $this->parser->getStream()->expect(SQLShade_Token::OPERATOR_TYPE, ']');
         }
 
-        return new SQLShade_Node_Expression_AttrName($node, $arg, $lineno);
+        return new SQLShade_Node_Expression_AttrName($node, $attr, $lineno, $token);
     }
 
 }

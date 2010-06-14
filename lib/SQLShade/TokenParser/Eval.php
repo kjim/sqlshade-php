@@ -10,23 +10,21 @@ class SQLShade_TokenParser_Eval extends SQLShade_TokenParser_Embed {
     public function parse(/*Token*/$token) {
         $lineno = $token->getLine();
 
-        $token = $this->parser->getCurrentToken();
-        $this->parser->getStream()->expect(SQLShade_Token::NAME_TYPE);
-        $ident = new SQLShade_Node_Expression_Name($token->getValue(), $lineno);
+        $expr = $this->parser->getExpressionParser()->parseExpression();
 
         $this->parser->getStream()->expect(SQLShade_Token::BLOCK_END_TYPE);
-        $compound = $this->parser->subparse(array($this, 'decideEvalEnd'), true);
+        $compound = $this->parser->subparse(array($this, 'decideEnd'), true);
         $this->parser->getStream()->expect(SQLShade_Token::BLOCK_END_TYPE);
 
-        return new SQLShade_Node_Eval($ident, $compound, $lineno);
-    }
-
-    public function decideEvalEnd($token) {
-        return $token->test('endeval');
+        return new SQLShade_Node_Eval($expr, $compound, $lineno, null);
     }
 
     public function getTag() {
         return 'eval';
+    }
+
+    public function getEndTag() {
+        return 'endeval';
     }
 
 }

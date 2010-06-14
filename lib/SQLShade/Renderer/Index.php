@@ -15,11 +15,17 @@ class SQLShade_Renderer_Index {
 
     public function render(/*Node_Module*/$node, $data = array()) {
         $printer = new SQLShade_Printer_Index();
-        $context = array(
-            'printer' => $printer,
-            'context' => (is_array($data) ? new SQLShade_RenderContext($data) : $data),
-            );
-        $this->traverse($node->getBody(), $context);
+        $context = new SQLShade_RenderContext($data);
+        return $this->_render($node, $context, $printer);
+    }
+
+    protected function _render($node, $context, $printer = null) {
+        if ($printer === null) {
+            $printer = new SQLShade_Printer_Index();
+        }
+
+        $ctx = array('printer' => $printer, 'context' => $context);
+        $this->traverse($node->getBody(), $ctx);
         return $printer->freeze();
     }
 
@@ -27,6 +33,39 @@ class SQLShade_Renderer_Index {
         foreach ($node->getChildren() as $n) {
             $n->acceptVisitor($this, $ctx);
         }
+    }
+
+    protected function serializeNode($node) {
+        list($serialized, $pad) = array('', '');
+        foreach ($this->env->getParser()->subdeparse($node) as $token) {
+            switch ($token->getType()) {
+                case SQLShade_Token::BLOCK_START_TYPE:
+                    $serialized .= '/*#';
+                    $pad = '';
+                    break;
+
+                case SQLShade_Token::VAR_START_TYPE:
+                    $serialized .= '/*:';
+                    $pad = '';
+                    break;
+
+                case SQLShade_Token::BLOCK_END_TYPE:
+                case SQLShade_Token::VAR_END_TYPE:
+                    $serialized .= '*/';
+                    $pad = '';
+                    break;
+
+                case SQLShade_Token::EOF_TYPE:
+                    return $serialized;
+
+                default:
+                    $serialized .= $pad . $token->getValue();
+                    $pad = ' ';
+                    break;
+            }
+        }
+
+        return $serialized;
     }
 
     protected function toAttributeAccessKey($node) {
@@ -47,7 +86,17 @@ class SQLShade_Renderer_Index {
     }
 
     protected function getAttribute($node, $context) {
-        return $context->data[$this->toAttributeAccessKey($node)];
+        switch (get_class($node)) {
+            case 'SQLShade_Node_Expression_Constant':
+                $attribute = $node->getValue();
+                break;
+
+            default:
+                $attribute = $context->data[$this->toAttributeAccessKey($node)];
+                break;
+        }
+        
+        return $attribute;
     }
 
     public function visitLiteral($node, &$ctx) {
@@ -63,6 +112,9 @@ class SQLShade_Renderer_Index {
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $expr);
+            }
+            else {
+                $ctx['printer']->write($this->serializeNode($node));
             }
             return;
         }
@@ -95,6 +147,10 @@ class SQLShade_Renderer_Index {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
+            else {
+                $ctx['printer']->write($this->serializeNode($node));
+            }
+            return;
         }
         $this->writeEmbed($node, $ctx, $variable);
     }
@@ -112,6 +168,9 @@ class SQLShade_Renderer_Index {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
+            else {
+                $ctx['printer']->write($this->serializeNode($node));
+            }
             return;
         }
         $this->writeEval($node, $ctx, $source);
@@ -119,7 +178,7 @@ class SQLShade_Renderer_Index {
 
     protected function writeEval($node, &$ctx, &$source) {
         $subNode = $this->env->compileSource($source, '<inner_source>');
-        list($innerQuery, $innerBounds) = $this->render($subNode, clone $ctx['context']);
+        list($innerQuery, $innerBounds) = $this->_render($subNode, clone $ctx['context']);
 
         $printer = $ctx['printer'];
         $printer->write($innerQuery);
@@ -136,6 +195,9 @@ class SQLShade_Renderer_Index {
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $expr);
+            }
+            else {
+                $ctx['printer']->write($this->serializeNode($node));
             }
             return;
         }
@@ -156,6 +218,9 @@ class SQLShade_Renderer_Index {
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $ident);
+            }
+            else {
+                $ctx['printer']->write($this->serializeNode($node));
             }
             return;
         }

@@ -3,9 +3,11 @@
 abstract class SQLShade_Node {
 
     protected $lineno;
+    protected $token;
 
-    public function __construct($lineno) {
+    public function __construct($lineno, $token) {
         $this->lineno = $lineno;
+        $this->token = $token;
     }
 
     public function __toString() {
@@ -14,6 +16,10 @@ abstract class SQLShade_Node {
 
     public function getLine() {
         return $this->lineno;
+    }
+
+    public function getToken() {
+        return $this->token;
     }
 
     public function getChildren() {

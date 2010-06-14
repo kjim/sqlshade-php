@@ -16,7 +16,7 @@ $exprparser = new SQLShade_ExpressionParser($driveparser);
 
 $testname = 'test.sql';
 
-// @test
+// @test parse
 $stream = new SQLShade_TokenStream(
     array(
         new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
@@ -34,7 +34,11 @@ $node = $exprparser->parseExpression();
 $t->isa_ok($node, 'SQLShade_Node_Expression_Name', 'instance of Expression_Name');
 $t->is($node->getName(), 'item', 'getName() returns "item"');
 
-// @test
+// @test deparse
+$tokens = $exprparser->deparseExpression($node);
+is_tokens_order($t, $tokens, array(array(SQLShade_Token::NAME_TYPE, 'item')));
+
+// @test parse
 $stream = new SQLShade_TokenStream(
     array(
         new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
@@ -60,6 +64,14 @@ $t->is($sourceNode->getName(), 'item');
 $attrNode = $node->getAttr();
 $t->isa_ok($attrNode, 'SQLShade_Node_Expression_Constant', 'attribute node is instance of Constant');
 $t->is($attrNode->getValue(), 'name');
+
+// @test deparse
+$tokens = $exprparser->deparseExpression($node);
+is_tokens_order($t, $tokens,
+                array(array(SQLShade_Token::NAME_TYPE, 'item'),
+                      array(SQLShade_Token::OPERATOR_TYPE, '.'),
+                      array(SQLShade_Token::NAME_TYPE, 'name'),
+                    ));
 
 // @test
 $stream = new SQLShade_TokenStream(
@@ -116,6 +128,16 @@ function stringify_expression_varname($node) {
 
 $t->is(stringify_expression_varname($node1st), 'item.name.first', 'stringify');
 
+// @test deparse
+$tokens = $exprparser->deparseExpression($node1st);
+is_tokens_order($t, $tokens,
+                array(array(SQLShade_Token::NAME_TYPE, 'item'),
+                      array(SQLShade_Token::OPERATOR_TYPE, '.'),
+                      array(SQLShade_Token::NAME_TYPE, 'name'),
+                      array(SQLShade_Token::OPERATOR_TYPE, '.'),
+                      array(SQLShade_Token::NAME_TYPE, 'first'),
+                    ));
+
 // @test
 $stream = new SQLShade_TokenStream(
     array(
@@ -160,3 +182,10 @@ $t->isa_ok($node, 'SQLShade_Node_Expression_Unary_Not');
 $innerNode = $node->getNode();
 $t->isa_ok($innerNode, 'SQLShade_Node_Expression_Name');
 $t->is($innerNode->getName(), 'item');
+
+// @test deparse
+$tokens = $exprparser->deparseExpression($node);
+is_tokens_order($t, $tokens,
+                array(array(SQLShade_Token::NAME_TYPE, 'not'),
+                      array(SQLShade_Token::NAME_TYPE, 'item'),
+                    ));
