@@ -115,6 +115,34 @@ class SQLShade_Parser {
         return new SQLShade_Node_Compound($rv, $lineno);
     }
 
+    public function subskip($test, $drop_needle = false) {
+        $lineno = $this->getCurrentToken()->getLine();
+        while (!$this->stream->isEOF()) {
+            $tokentype = $this->getCurrentToken()->getType();
+            if ($tokentype === SQLShade_Token::BLOCK_START_TYPE) {
+                $this->stream->next(); // skip
+                $token = $this->getCurrentToken();
+                
+                if ($token->getType() !== SQLShade_Token::NAME_TYPE) {
+                    throw new SQLShade_SyntaxError('A block must start with a tag name', $token->getLine());
+                }
+
+                if (!is_null($test) && call_user_func($test, $token)) {
+                    if ($drop_needle) {
+                        $this->stream->next();
+                    }
+
+                    return new SQLShade_Node_Compound(array(), $lineno);
+                }
+            }
+            else {
+                $this->stream->next();
+            }
+        }
+
+        return new SQLShade_Node_Compound(array(), $lineno);
+    }
+
     public function subdeparse($node) {
         $lineno = $node->getLine();
         $tokens = array();

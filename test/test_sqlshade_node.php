@@ -55,12 +55,12 @@ class Walker {
 }
 
 // @test
-$node = new Example(1);
+$node = new Example(1, null);
 $t->is($node->getVisitName(), 'visitExample');
 
 // @test
 $walker = new Walker();
-$walker->walk(new Example(1));
+$walker->walk(new Example(1, null));
 $t->is($walker->logs, array('example'));
 
 // @test
