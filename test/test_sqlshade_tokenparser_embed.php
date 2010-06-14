@@ -43,18 +43,6 @@ $t->isa_ok($node->getExpr(), "SQLShade_Node_Expression_Name");
 $nodes = $node->getChildren();
 $t->is(count($nodes), 0);
 
-// @test deparse
-$tokens = $tokenparser->deparse($node);
-is_tokens_order($t, $tokens,
-                array(array(SQLShade_Token::BLOCK_START_TYPE, ''),
-                      array(SQLShade_Token::NAME_TYPE, 'embed'),
-                      array(SQLShade_Token::NAME_TYPE, 'item'),
-                      array(SQLShade_Token::BLOCK_END_TYPE, ''),
-                      array(SQLShade_Token::BLOCK_START_TYPE, ''),
-                      array(SQLShade_Token::NAME_TYPE, 'endembed'),
-                      array(SQLShade_Token::BLOCK_END_TYPE, ''),
-                    ));
-
 // @test
 $stream = new SQLShade_TokenStream(
     array(
@@ -81,15 +69,3 @@ $node = $tokenparser->parse($embedToken);
 $t->isa_ok($node, "SQLShade_Node_Embed",
        'SQLShade_TokenParser_Embed generates instance of SQLShade_Node_Embed');
 $t->isa_ok($node->getExpr(), "SQLShade_Node_Expression_Name");
-
-// @test deparse
-$tokens = $tokenparser->deparse($node);
-is_tokens_order($t, $tokens,
-                array(array(SQLShade_Token::BLOCK_START_TYPE, ''),
-                      array(SQLShade_Token::NAME_TYPE, 'embed'),
-                      array(SQLShade_Token::NAME_TYPE, 'item'),
-                      array(SQLShade_Token::BLOCK_END_TYPE, ''),
-                      array(SQLShade_Token::BLOCK_START_TYPE, ''),
-                      array(SQLShade_Token::NAME_TYPE, 'endembed'),
-                      array(SQLShade_Token::BLOCK_END_TYPE, ''),
-                    ));

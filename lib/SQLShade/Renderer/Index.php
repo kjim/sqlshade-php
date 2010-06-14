@@ -35,39 +35,6 @@ class SQLShade_Renderer_Index {
         }
     }
 
-    protected function serializeNode($node) {
-        list($serialized, $pad) = array('', '');
-        foreach ($this->env->getParser()->subdeparse($node) as $token) {
-            switch ($token->getType()) {
-                case SQLShade_Token::BLOCK_START_TYPE:
-                    $serialized .= '/*#';
-                    $pad = '';
-                    break;
-
-                case SQLShade_Token::VAR_START_TYPE:
-                    $serialized .= '/*:';
-                    $pad = '';
-                    break;
-
-                case SQLShade_Token::BLOCK_END_TYPE:
-                case SQLShade_Token::VAR_END_TYPE:
-                    $serialized .= '*/';
-                    $pad = '';
-                    break;
-
-                case SQLShade_Token::EOF_TYPE:
-                    return $serialized;
-
-                default:
-                    $serialized .= $pad . $token->getValue();
-                    $pad = ' ';
-                    break;
-            }
-        }
-
-        return $serialized;
-    }
-
     protected function toAttributeAccessKey($node) {
         $nodetype = get_class($node);
         if ($nodetype === 'SQLShade_Node_Expression_Name') {
@@ -113,9 +80,6 @@ class SQLShade_Renderer_Index {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
-            else {
-                $ctx['printer']->write($this->serializeNode($node));
-            }
             return;
         }
         $this->writeSubstitute($node, $ctx, $variable);
@@ -147,9 +111,6 @@ class SQLShade_Renderer_Index {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
-            else {
-                $ctx['printer']->write($this->serializeNode($node));
-            }
             return;
         }
         $this->writeEmbed($node, $ctx, $variable);
@@ -180,9 +141,6 @@ class SQLShade_Renderer_Index {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $expr);
             }
-            else {
-                $ctx['printer']->write($this->serializeNode($node));
-            }
             return;
         }
         $this->writeIf($node, $ctx, $variable);
@@ -202,9 +160,6 @@ class SQLShade_Renderer_Index {
         } catch (SQLShade_KeyError $e) {
             if ($this->strict) {
                 throw new SQLShade_RenderError('Has no parameters: ' . $ident);
-            }
-            else {
-                $ctx['printer']->write($this->serializeNode($node));
             }
             return;
         }

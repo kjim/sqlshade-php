@@ -28,15 +28,6 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         return new SQLShade_Node_Substitute($expr, $faketext, $lineno, null);
     }
 
-    public function deparse($node) {
-        $lineno = $node->getLine();
-        $tokens = array(new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', $lineno));
-        $tokens = array_merge($tokens, $this->parser->getExpressionParser()->deparseExpression($node->getExpr()));
-        $tokens[] = new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', $lineno);
-        $tokens[] = new SQLShade_Token(SQLShade_Token::TEXT_TYPE, $node->getFaketext(), $lineno);
-        return $tokens;
-    }
-
     public function _parseFaketext($text, $lineno) {
         if (is_null($text) || strlen($text) <= 0) {
             return ''; // return empty string

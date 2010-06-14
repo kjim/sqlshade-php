@@ -143,36 +143,6 @@ class SQLShade_Parser {
         return new SQLShade_Node_Compound(array(), $lineno);
     }
 
-    public function subdeparse($node) {
-        $lineno = $node->getLine();
-        $tokens = array();
-
-        $nodetype = get_class($node);
-        switch ($nodetype) {
-            case 'SQLShade_Node_Literal':
-                $tokens[] = $node->getToken();
-                break;
-
-            case 'SQLShade_Node_Compound':
-                foreach ($node->getChildren() as $n) {
-                    $tokens = array_merge($tokens, $this->subdeparse($n));
-                }
-                break;
-
-            default:
-                $nodename = strtolower(array_pop(explode("_", $nodetype)));
-                if (!isset($this->handlers[$nodename])) {
-                    throw new LogicException("Unexpected node type: " . $nodetype);
-                }
-
-                $subparser = $this->handlers[$nodename];
-                $tokens = array_merge($tokens, $subparser->deparse($node));
-                break;
-        }
-
-        return $tokens;
-    }
-
     public function addHandler($name, $class) {
         $this->handlers[$name] = $class;
     }

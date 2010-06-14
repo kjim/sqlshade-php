@@ -103,9 +103,12 @@ $exectableWhereClauseQuery = "
 $templateWhereClause = new SQLShade_Template($exectableWhereClauseQuery, array('strict' => false));
 list($tmpQuery, $_) = $templateWhereClause->render();
 $t->unlike($tmpQuery, '/\/\*#if false\*\//', 'removed false block');
-$t->like($tmpQuery, '/\/\*#if use_condition_keyword\*\//', 'unfeed params in block to remain');
-$t->like($tmpQuery, '/\/\*#if use_condition_fetch_status\*\//', 'unfeed params in block to remain');
-$t->like($tmpQuery, '/\/\*#if use_condition_sector\*\//', 'unfeed params in block to remain');
+$t->unlike($tmpQuery, '/\/\*#if use_condition_keyword\*\//', 'unfeed params in block to remain');
+$t->unlike($tmpQuery, '/\/\*#if use_condition_fetch_status\*\//', 'unfeed params in block to remain');
+$t->unlike($tmpQuery, '/\/\*#if use_condition_sector\*\//', 'unfeed params in block to remain');
+
+$t->like($tmpQuery, '/AND t_favorite.status = /', 'it remains possible that nostrict mode generates un-executable query');
+$t->unlike($tmpQuery, '/AND t_favorite.status = \?/', 'it remains possible that nostrict mode generates un-executable query');
 
 // test count query
 $countQuery = "

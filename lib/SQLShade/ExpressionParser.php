@@ -19,34 +19,6 @@ class SQLShade_ExpressionParser {
         return $this->parseConditionalExpression();
     }
 
-    public function deparseExpression($node) {
-        $nodetype = get_class($node);
-        $tokens = array();
-        switch ($nodetype) {
-            case 'SQLShade_Node_Expression_Unary_Not':
-                $tokens[] = $node->getToken();
-                $tokens = array_merge($tokens, $this->deparseExpression($node->getNode()));
-                break;
-
-            case 'SQLShade_Node_Expression_AttrName':
-                $tokens = array_merge($tokens, $this->deparseExpression($node->getNode()));
-                $tokens[] = new SQLShade_Token(SQLShade_Token::OPERATOR_TYPE, '.', $node->getLine());
-                $tokens = array_merge($tokens, $this->deparseExpression($node->getAttr()));
-                break;
-
-            case 'SQLShade_Node_Expression_Name':
-            case 'SQLShade_Node_Expression_AssignName':
-            case 'SQLShade_Node_Expression_Constant':
-                $tokens[] = $node->getToken();
-                break;
-
-            default:
-                throw new LogicException("Unexpected node type: " . $nodetype);
-        }
-
-        return $tokens;
-    }
-
     public function parseConditionalExpression() {
         $lineno = $this->parser->getCurrentToken()->getLine();
         $expr = $this->parseUnaryExpression();

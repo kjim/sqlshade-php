@@ -40,15 +40,6 @@ $t->is($node->getFaketext(), "'faketext'", "faketext is 'faketext'");
 $token = $stream1->getCurrent();
 $t->is($token->getValue(), '', "getValue() not return 'faketext' value");
 
-// @test deparse
-$tokens = $tokenparser->deparse($node);
-is_tokens_order($t, $tokens,
-                array(array(SQLShade_Token::VAR_START_TYPE, ''),
-                      array(SQLShade_Token::NAME_TYPE, 'item'),
-                      array(SQLShade_Token::VAR_END_TYPE, ''),
-                      array(SQLShade_Token::TEXT_TYPE, "'faketext'"),
-                    ));
-
 // @test
 $stream2 = new SQLShade_TokenStream(
     array(
@@ -71,15 +62,6 @@ $t->is($node->getFaketext(), "123456", "faketext is 123456");
 $token = $stream2->getCurrent();
 $t->is($token->getValue(), ' AND ...', "getValue() return value has no literal 123456");
 
-// @test deparse
-$tokens = $tokenparser->deparse($node);
-is_tokens_order($t, $tokens,
-                array(array(SQLShade_Token::VAR_START_TYPE, ''),
-                      array(SQLShade_Token::NAME_TYPE, 'item'),
-                      array(SQLShade_Token::VAR_END_TYPE, ''),
-                      array(SQLShade_Token::TEXT_TYPE, "123456"),
-                    ));
-
 // @test
 $stream = new SQLShade_TokenStream(
     array(
@@ -96,17 +78,6 @@ $driveparser->setStream($stream);
 
 $node = $tokenparser->parse($token);
 $t->isa_ok($node, "SQLShade_Node_Substitute");
-
-// @test
-$tokens = $tokenparser->deparse($node);
-is_tokens_order($t, $tokens,
-                array(array(SQLShade_Token::VAR_START_TYPE, ''),
-                      array(SQLShade_Token::NAME_TYPE, 'item'),
-                      array(SQLShade_Token::OPERATOR_TYPE, '.'),
-                      array(SQLShade_Token::NAME_TYPE, 'name'),
-                      array(SQLShade_Token::VAR_END_TYPE, ''),
-                      array(SQLShade_Token::TEXT_TYPE, "TRUE"),
-                    ));
 
 // @test
 $shouldBeCloseParen = ")";
