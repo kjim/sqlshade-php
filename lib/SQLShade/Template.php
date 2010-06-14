@@ -29,6 +29,14 @@ class SQLShade_Template {
         return $this->renderer->render($this->node, $context);
     }
 
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getNode() {
+        return $this->node;
+    }
+
     static protected function getDefaultEnvironment() {
         if (self::$defaultEnvironment === null) {
             self::$defaultEnvironment = new SQLShade_Environment();

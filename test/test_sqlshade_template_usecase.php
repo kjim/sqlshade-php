@@ -100,8 +100,8 @@ $exectableWhereClauseQuery = "
 ";
 
 // @test
-$tempalteWhereClause = new SQLShade_Template($exectableWhereClauseQuery, array('strict' => false));
-list($tmpQuery, $_) = $tempalteWhereClause->render();
+$templateWhereClause = new SQLShade_Template($exectableWhereClauseQuery, array('strict' => false));
+list($tmpQuery, $_) = $templateWhereClause->render();
 $t->unlike($tmpQuery, '/\/\*#if false\*\//', 'removed false block');
 $t->like($tmpQuery, '/\/\*#if use_condition_keyword\*\//', 'unfeed params in block to remain');
 $t->like($tmpQuery, '/\/\*#if use_condition_fetch_status\*\//', 'unfeed params in block to remain');
@@ -110,10 +110,10 @@ $t->like($tmpQuery, '/\/\*#if use_condition_sector\*\//', 'unfeed params in bloc
 // test count query
 $countQuery = "
     SELECT COUNT(t_favorite.id) FROM t_favorite WHERE TRUE
-    /*#eval where_clause*/AND TRUE/*#endeval*/
+    /*#embed where_clause*/AND TRUE/*#endembed*/
 ";
 $parameters = array(
-    "where_clause" => $tmpQuery,
+    "where_clause" => $templateWhereClause,
     "use_condition_keyword" => false,
     "use_condition_fetch_status" => false,
     "use_condition_sector" => false,
@@ -128,15 +128,12 @@ $t->like($query, '/AND t_favorite\.status = \?/');
 $t->is($bound, array(1), 'bound variables are correct');
 
 // test select datarows query
-$templateWhereClause = new SQLShade_Template($exectableWhereClauseQuery, array('strict' => false));
-list($query, $_) = $templateWhereClause->render();
-
 $selectQuery = "SELECT * FROM t_favorite
     WHERE TRUE
-        /*#eval where_clause*/AND TRUE/*#endeval*/
+        /*#embed where_clause*/AND TRUE/*#endembed*/
     ;";
 $parameters = array(
-    "where_clause" => $tmpQuery,
+    "where_clause" => $templateWhereClause,
     "use_condition_keyword" => true, "keywords" => array('abc', 'def', 'hij'),
     "use_condition_fetch_status" => false,
     "use_condition_sector" => true, "sector_table" => 't_sector_ZZ',
@@ -145,7 +142,7 @@ $parameters = array(
 
 $template = new SQLShade_Template($selectQuery);
 list($query, $bound) = $template->render($parameters);
-$t->is(substr_count($query, "OR UPPER(t_favorite.remarks) LIKE UPPER('%' || ?  || '%')"), 3);
+$t->is(substr_count($query, "OR UPPER(t_favorite.remarks) LIKE UPPER('%' || ? || '%')"), 3);
 $t->is($bound, array('abc', 'def', 'hij', 1));
 $t->like($query, "/AND t_favorite\.record_type EXISTS \(
             SELECT 1 FROM t_sector_ZZ

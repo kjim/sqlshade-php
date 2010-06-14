@@ -156,34 +156,18 @@ class SQLShade_Renderer_Index {
     }
 
     protected function writeEmbed($node, &$ctx, &$variable) {
-        $ctx['printer']->write($variable);
-    }
+        if (is_callable(array($variable, "getNode"))) {
+            $subnode = $variable->getNode();
+            list($query, $bound) = $this->_render($subnode, $ctx['context']);
 
-    public function visitEval($node, &$ctx) {
-        $context = $ctx['context'];
-        $expr = $node->getExpr();
-        try {
-            $source = $this->getAttribute($expr, $context);
-        } catch (SQLShade_KeyError $e) {
-            if ($this->strict) {
-                throw new SQLShade_RenderError('Has no parameters: ' . $expr);
+            $printer = $ctx['printer'];
+            $printer->write($query);
+            foreach ($bound as $v) {
+                $printer->bind($v);
             }
-            else {
-                $ctx['printer']->write($this->serializeNode($node));
-            }
-            return;
         }
-        $this->writeEval($node, $ctx, $source);
-    }
-
-    protected function writeEval($node, &$ctx, &$source) {
-        $subNode = $this->env->compileSource($source, '<inner_source>');
-        list($innerQuery, $innerBounds) = $this->_render($subNode, clone $ctx['context']);
-
-        $printer = $ctx['printer'];
-        $printer->write($innerQuery);
-        foreach ($innerBounds as $v) {
-            $printer->bind($v);
+        else {
+            $ctx['printer']->write($variable);
         }
     }
 
