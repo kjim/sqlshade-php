@@ -37,7 +37,7 @@ $driveparser->setStream($stream);
 
 $node = $tokenparser->parse($token);
 $t->isa_ok($node, "SQLShade_Node_Embed",
-       'SQLShade_TokenParser_Embed generates instance of SQLShade_Node_Embed');
+           'SQLShade_TokenParser_Embed generates instance of SQLShade_Node_Embed');
 
 $t->isa_ok($node->getExpr(), "SQLShade_Node_Expression_Name");
 $nodes = $node->getChildren();

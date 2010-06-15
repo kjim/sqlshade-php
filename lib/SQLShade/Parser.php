@@ -58,7 +58,7 @@ class SQLShade_Parser {
             // literal
             if ($tokentype === SQLShade_Token::TEXT_TYPE) {
                 $token = $this->stream->next();
-                $rv[] = new SQLShade_Node_Literal($token->getValue(), $token->getLine(), $token);
+                $rv[] = new SQLShade_Node_Literal($token->getValue(), $token->getLine());
             }
 
             // substitute

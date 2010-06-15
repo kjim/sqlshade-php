@@ -5,8 +5,8 @@ class SQLShade_Node_Expression_Constant extends SQLShade_Node_Expression {
 
     protected $value;
 
-    public function __construct($value, $lineno, $token = null) {
-        parent::__construct($lineno, $token);
+    public function __construct($value, $lineno) {
+        parent::__construct($lineno);
         $this->value = $value;
     }
 

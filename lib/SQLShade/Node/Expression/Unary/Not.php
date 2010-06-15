@@ -5,8 +5,8 @@ class SQLShade_Node_Expression_Unary_Not extends SQLShade_Node_Expression {
 
     protected $node;
 
-    public function __construct($node, $lineno, $token) {
-        parent::__construct($lineno, $token);
+    public function __construct($node, $lineno) {
+        parent::__construct($lineno);
 
         $this->node  = $node;
     }

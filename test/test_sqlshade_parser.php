@@ -18,16 +18,16 @@ $stream1 = new SQLShade_TokenStream(
     'example.sql'
     );
 $node = $parser->parse($stream1);
-$t->ok($node instanceof SQLShade_Node_Module,
+$t->isa_ok($node, 'SQLShade_Node_Module',
        'return value is instance of SQLShade_Node_Module');
 
 $t->is($node->getFilename(), 'example.sql', 'filename is example.sql');
-$t->ok($node->getBody() instanceof SQLShade_Node_Compound,
+$t->isa_ok($node->getBody(), 'SQLShade_Node_Compound',
        'getBody() returns instance of SQLShade_Node_Compound');
 
 $nodes = $node->getBody()->getChildren();
 $t->is(count($nodes), 1);
-$t->ok($nodes[0] instanceof SQLShade_Node_Literal,
+$t->isa_ok($nodes[0], 'SQLShade_Node_Literal',
        'nodes[0] is instance of SQLShade_Node_Literal');
 
 // @test
@@ -60,22 +60,22 @@ $nodes = $node->getBody()->getChildren();
 $t->is(count($nodes), 3, 'count(nodes) is 3');
 
 // test 1st node
-$t->ok($nodes[0] instanceof SQLShade_Node_Literal,
+$t->isa_ok($nodes[0], 'SQLShade_Node_Literal',
        '$nodes[0] is instanceof SQLShade_Node_Literal');
 $t->is($nodes[0]->getLiteral(), 'SELECT * FROM t_table WHERE TRUE ');
 
 // test 2nd node
-$t->ok($nodes[1] instanceof SQLShade_Node_If,
+$t->isa_ok($nodes[1], 'SQLShade_Node_If',
        '$nodes[1] is instanceof SQLShade_Node_If');
 $ifnodes = $nodes[1]->getChildren();
 $t->is(count($ifnodes), 3);
-$t->ok($ifnodes[0] instanceof SQLShade_Node_Literal);
+$t->isa_ok($ifnodes[0], 'SQLShade_Node_Literal');
 $t->is($ifnodes[0]->getLiteral(), 'AND t_table.uid = ');
-$t->ok($ifnodes[1] instanceof SQLShade_Node_Substitute);
+$t->isa_ok($ifnodes[1], 'SQLShade_Node_Substitute');
 $t->is($ifnodes[1]->getExpr()->getName(), 'uid');
 $t->is($ifnodes[1]->getFaketext(), '832958');
 
 // test 4th node
-$t->ok($nodes[2] instanceof SQLShade_Node_Literal,
+$t->isa_ok($nodes[2], 'SQLShade_Node_Literal',
        '$nodes[2] is instanceof SQLShade_Node_Literal');
 $t->is($nodes[2]->getLiteral(), ';');

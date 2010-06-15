@@ -55,7 +55,7 @@ class Walker {
 }
 
 // @test
-$node = new Example(1, null);
+$node = new Example(1);
 $t->is($node->getVisitName(), 'visitExample');
 
 // @test

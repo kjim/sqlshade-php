@@ -7,7 +7,7 @@ class SQLShade_Node_Module extends SQLShade_Node {
     protected $filename;
 
     public function __construct(/*Node_Compound*/$body, $filename) {
-        parent::__construct(1, null);
+        parent::__construct(1);
 
         $this->body = $body;
         $this->filename = $filename;

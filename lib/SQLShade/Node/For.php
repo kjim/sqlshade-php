@@ -8,7 +8,7 @@ class SQLShade_Node_For extends SQLShade_Node {
     protected $body;
 
     public function __construct($item, $ident, /*Node_Compound*/$body, $lineno) {
-        parent::__construct($lineno, null);
+        parent::__construct($lineno);
 
         $this->item = $item;
         $this->ident = $ident;

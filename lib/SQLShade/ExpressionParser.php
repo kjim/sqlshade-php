@@ -37,7 +37,7 @@ class SQLShade_ExpressionParser {
         $token = $this->parser->getStream()->next();
         $node = $this->parseUnaryExpression();
 
-        return new SQLShade_Node_Expression_Unary_Not($node, $token->getLine(), $token);
+        return new SQLShade_Node_Expression_Unary_Not($node, $token->getLine());
     }
 
     public function parsePrimaryExpression($assignment = false) {
@@ -47,20 +47,20 @@ class SQLShade_ExpressionParser {
                 $this->parser->getStream()->next();
                 $value = $token->getValue();
                 if ($value === 'true') {
-                    $node = new SQLShade_Node_Expression_Constant(true, $token->getLine(), $token);
+                    $node = new SQLShade_Node_Expression_Constant(true, $token->getLine());
                 }
                 elseif ($value === 'false') {
-                    $node = new SQLShade_Node_Expression_Constant(false, $token->getLine(), $token);
+                    $node = new SQLShade_Node_Expression_Constant(false, $token->getLine());
                 }
                 else {
                     $cls = $assignment ? 'SQLShade_Node_Expression_AssignName' : 'SQLShade_Node_Expression_Name';
-                    $node = new $cls($token->getValue(), $token->getLine(), $token);
+                    $node = new $cls($token->getValue(), $token->getLine());
                 }
                 break;
 
             case SQLShade_Token::STRING_TYPE:
                 $this->parser->getStream()->next();
-                $node = new SQLShade_Node_Expression_Constant($token->getValue(), $token->getLine(), $token);
+                $node = new SQLShade_Node_Expression_Constant($token->getValue(), $token->getLine());
                 break;
 
             default:
@@ -99,7 +99,7 @@ class SQLShade_ExpressionParser {
         if ($token->getValue() == '.') {
             $token = $this->parser->getStream()->next();
             if ($token->getType() == SQLShade_Token::NAME_TYPE) {
-                $attr = new SQLShade_Node_Expression_Constant($token->getValue(), $lineno, $token);
+                $attr = new SQLShade_Node_Expression_Constant($token->getValue(), $lineno);
             } else {
                 throw new SQLShade_SyntaxError('Expected name or number', $lineno);
             }
@@ -108,7 +108,7 @@ class SQLShade_ExpressionParser {
             $this->parser->getStream()->expect(SQLShade_Token::OPERATOR_TYPE, ']');
         }
 
-        return new SQLShade_Node_Expression_AttrName($node, $attr, $lineno, $token);
+        return new SQLShade_Node_Expression_AttrName($node, $attr, $lineno);
     }
 
 }
