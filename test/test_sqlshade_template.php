@@ -91,25 +91,33 @@ $t->is($query, "SELECT *
 ");
 $t->is($bound, array(1, 1));
 
-// @test
+// @test behavior for strict and nostrict
 $plainQuery = "SELECT * FROM t_member
     WHERE TRUE
         AND t_member.member_id IN /*:member_ids*/(100, 200, 300, 400)
         AND t_member.nickname = /*:nickname*/'kjim'
 ";
-$template = new SQLShade_Template($plainQuery);
+$strictTemplate = new SQLShade_Template($plainQuery);
 try {
-    $template->render();
+    $strictTemplate->render();
     $t->fail();
 } catch (SQLShade_RenderError $e) {
     $t->pass('raise if no variables feeded');
 }
 try {
-    $template->render(array('nickname' => 'keiji'));
+    $strictTemplate->render(array('nickname' => 'keiji'));
     $t->fail();
 } catch (SQLShade_RenderError $e) {
     $t->pass();
 }
+$nostrictTemplate = new SQLShade_Template($plainQuery, array('strict' => false));
+list($query, $bound) = $nostrictTemplate->render();
+$t->is($query, "SELECT * FROM t_member
+    WHERE TRUE
+        AND t_member.member_id IN 
+        AND t_member.nickname = 
+", "sqlshade generates invalid query at nostrict mode");
+$t->is_deeply($bound, array(), "parameters are not bound");
 
 // @test
 $plainQuery = "SELECT * FROM t_member
