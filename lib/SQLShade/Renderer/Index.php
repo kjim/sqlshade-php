@@ -168,7 +168,7 @@ class SQLShade_Renderer_Index {
     }
 
     protected function writeFor($node, &$ctx, &$alias, &$sequence) {
-        $forBlockContext = clone $ctx['context'];
+        $forBlockContext = clone($ctx['context']);
         $forBlockCtx = $ctx;
         $forBlockCtx['context'] = $forBlockContext;
         foreach ($sequence as $idata) {

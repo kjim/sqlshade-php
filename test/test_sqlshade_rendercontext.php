@@ -55,7 +55,7 @@ try {
     $t->pass();
 }
 
-$cloneContext = clone $context;
+$cloneContext = clone($context);
 $cloneContext->data->update(array('prop1' => 'value_of_prop1'));
 $t->is($cloneContext->data['prop1'], 'value_of_prop1');
 try {

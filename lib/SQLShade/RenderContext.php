@@ -12,7 +12,7 @@ class SQLShade_RenderContext {
     }
 
     public function __clone() {
-        $this->data = clone $this->data;
+        $this->data = clone($this->data);
         $this->env = $this->env;
     }
 
