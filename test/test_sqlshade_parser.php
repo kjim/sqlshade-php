@@ -79,3 +79,34 @@ $t->is($ifnodes[1]->getFaketext(), '832958');
 $t->isa_ok($nodes[2], 'SQLShade_Node_Literal',
        '$nodes[2] is instanceof SQLShade_Node_Literal');
 $t->is($nodes[2]->getLiteral(), ';');
+
+// @test using japanese name
+$stream3 = new SQLShade_TokenStream(
+    array(
+        new SQLShade_Token(SQLShade_Token::TEXT_TYPE,
+                           'SELECT column_a as カラムＡ /* 日本語別名 */ FROM t_table as テーブル WHERE TRUE ', 1),
+        new SQLShade_Token(SQLShade_Token::TEXT_TYPE,
+                           "AND テーブル.fulltext like '%' || ", 2),
+        new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 2),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'fulltext', 2),
+        new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 2),
+        new SQLShade_Token(SQLShade_Token::TEXT_TYPE,
+                           "'サンプルテキスト' || '%'", 2),
+        new SQLShade_Token(SQLShade_Token::TEXT_TYPE,
+                           ';', 4),
+        new SQLShade_Token(SQLShade_Token::EOF_TYPE, '', 1),
+        ),
+    'using_japanese_name.sql'
+    );
+$node = $parser->parse($stream3);
+$nodes = $node->getBody()->getChildren();
+$t->is(count($nodes), 5, 'count(nodes) is 3');
+
+//
+$t->is($nodes[0]->getLiteral(),
+       "SELECT column_a as カラムＡ /* 日本語別名 */ FROM t_table as テーブル WHERE TRUE ");
+$t->is($nodes[1]->getLiteral(), "AND テーブル.fulltext like '%' || ");
+$t->isa_ok($nodes[2], "SQLShade_Node_Substitute");
+$t->is($nodes[2]->getExpr()->getName(), "fulltext");
+$t->is($nodes[3]->getLiteral(), " || '%'");
+$t->is($nodes[4]->getLiteral(), ";");

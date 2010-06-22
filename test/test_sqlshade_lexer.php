@@ -95,6 +95,9 @@ $t->is($stream->next()->getValue(), "'here!!' label");
 $stream = $lexer->tokenize("3523.382, 2e10");
 $t->is($stream->next()->getValue(), "3523.382, 2e10");
 
+$stream = $lexer->tokenize("あかさたな");
+$t->is($stream->next()->getValue(), "あかさたな", "test double byte chars");
+
 // @test
 $stream = $lexer->tokenize("/*# if True *//*# endif */");
 
