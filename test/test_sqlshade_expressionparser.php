@@ -34,6 +34,74 @@ $node = $exprparser->parseExpression();
 $t->isa_ok($node, 'SQLShade_Node_Expression_Name', 'instance of Expression_Name');
 $t->is($node->getName(), 'item', 'getName() returns "item"');
 
+// @test parse constants
+$stream = new SQLShade_TokenStream(
+    array(
+        new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'true', 1),
+        new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 1),
+
+        new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'True', 1),
+        new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 1),
+
+        new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'false', 1),
+        new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 1),
+
+        new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'False', 1),
+        new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 1),
+
+        new SQLShade_Token(SQLShade_Token::EOF_TYPE, '', 1),
+        ),
+    $testname
+    );
+$driveparser->setStream($stream);
+
+// "true" is true
+$stream->next();
+$node = $exprparser->parseExpression();
+$t->isa_ok($node, 'SQLShade_Node_Expression_Constant', 'instance of Expression_Constant');
+$t->is($node->getValue(), true, 'string "true" is converted true value');
+
+// "True" is true
+$stream->next();
+$stream->next();
+$node = $exprparser->parseExpression();
+$t->isa_ok($node, 'SQLShade_Node_Expression_Constant', 'instance of Expression_Constant');
+$t->is($node->getValue(), true, 'string "True" is converted true value');
+
+// "false" is false
+$stream->next();
+$stream->next();
+$node = $exprparser->parseExpression();
+$t->isa_ok($node, 'SQLShade_Node_Expression_Constant', 'instance of Expression_Constant');
+$t->is($node->getValue(), false, 'string "false" is converted false value');
+
+// "False" is false
+$stream->next();
+$stream->next();
+$node = $exprparser->parseExpression();
+$t->isa_ok($node, 'SQLShade_Node_Expression_Constant', 'instance of Expression_Constant');
+$t->is($node->getValue(), false, 'string "False" is converted false value');
+
+// @test not boolean value
+$stream = new SQLShade_TokenStream(
+    array(
+        new SQLShade_Token(SQLShade_Token::VAR_START_TYPE, '', 1),
+        new SQLShade_Token(SQLShade_Token::NAME_TYPE, 'TRUE', 1),
+        new SQLShade_Token(SQLShade_Token::VAR_END_TYPE, '', 1),
+
+        new SQLShade_Token(SQLShade_Token::EOF_TYPE, '', 1),
+        ),
+    $testname
+    );
+$driveparser->setStream($stream);
+$stream->next();
+$node = $exprparser->parseExpression();
+$t->isa_ok($node, 'SQLShade_Node_Expression_Name', '"TRUE" string value is not constatnt');
+
 // @test parse
 $stream = new SQLShade_TokenStream(
     array(

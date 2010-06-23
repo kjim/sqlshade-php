@@ -52,10 +52,10 @@ class SQLShade_ExpressionParser
             case SQLShade_Token::NAME_TYPE:
                 $this->parser->getStream()->next();
                 $value = $token->getValue();
-                if ($value === 'true') {
+                if ($value === 'true' || $value === 'True') {
                     $node = new SQLShade_Node_Expression_Constant(true, $token->getLine());
                 }
-                elseif ($value === 'false') {
+                elseif ($value === 'false' || $value === 'False') {
                     $node = new SQLShade_Node_Expression_Constant(false, $token->getLine());
                 }
                 else {
