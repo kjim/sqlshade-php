@@ -19,7 +19,7 @@ list($query, $bound) = $renderer->render($node, array());
 $t->is($query, 'SELECT * FROM t_table;', 'generates query for prepare');
 $t->is($bound, array(), 'bound variables are empty');
 
-// @test
+// @test a substitute
 $node = NodeCollections::one_substitute('uid', '123456');
 list($query, $bound) = $renderer->render($node, array('uid' => 3456));
 $t->is($query, ':uid', 'scalar makes one placeholder');
@@ -37,23 +37,7 @@ try {
 }
 
 // @test
-$templateName = 'test_embed.sql';
-$node = new SQLShade_Node_Module(
-    new SQLShade_Node_Compound(
-        array(
-            new SQLShade_Node_Literal('SELECT * FROM ', 1),
-            new SQLShade_Node_Embed(
-                new SQLShade_Node_Expression_Name('table', 1),
-                new SQLShade_Node_Compound(
-                    array(
-                        new SQLShade_Node_Literal('t_table', 1),
-                        ),
-                    1),
-                1),
-            new SQLShade_Node_Literal(';', 1),
-            ),
-        1),
-    $templateName);
+$node = NodeCollections::replace_select_table();
 list($query, $bound) = $renderer->render($node, array('table' => 't_table_extension'));
 $t->is($query, 'SELECT * FROM t_table_extension;', 'embed t_table_extension');
 
