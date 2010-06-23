@@ -36,7 +36,7 @@ try {
     $t->pass('raise error if not pass parameter in context');
 }
 
-// @test
+// @test embed
 $node = NodeCollections::replace_select_from_table();
 list($query, $bound) = $renderer->render($node, array('table' => 't_table_extension'));
 $t->is($query, 'SELECT * FROM t_table_extension;', 'embed t_table_extension');
@@ -44,8 +44,7 @@ $t->is($query, 'SELECT * FROM t_table_extension;', 'embed t_table_extension');
 list($query, $bound) = $renderer->render($node, array('table' => 't_table_test'));
 $t->is($query, 'SELECT * FROM t_table_test;', 'embed t_table_test');
 
-// @test
-$templateName = 'test_if.sql';
+// @test if
 $node = NodeCollections::enable_or_disable_true_condition();
 
 // boolean
@@ -79,27 +78,8 @@ $t->like($query, '/WHERE TRUE/', 'array(1, 2, 3) is enable if-block');
 list($query, $_) = $renderer->render($node, array('boolean_item' => array()));
 $t->unlike($query, '/WHERE TRUE/', 'array() is disable if-block');
 
-// @test
-$templateName = 'test_for_scalar.sql';
-$node = new SQLShade_Node_Module(
-    new SQLShade_Node_Compound(
-        array(
-            new SQLShade_Node_For(
-                new SQLShade_Node_Expression_AssignName('keyword', 1),
-                new SQLShade_Node_Expression_Name('keywords', 1),
-                new SQLShade_Node_Compound(
-                    array(
-                        new SQLShade_Node_Literal("AND desc LIKE '%' || ", 1),
-                        new SQLShade_Node_Substitute(
-                            new SQLShade_Node_Expression_Name('keyword', 1),
-                            '123456', 1),
-                        new SQLShade_Node_Literal(" || '%' ", 1),
-                        ),
-                    1),
-                1),
-            ),
-        1),
-    $templateName);
+// @test for
+$node = NodeCollections::iterate_keyword_conditions();
 list($query, $bound) = $renderer->render($node, array('keywords' => array('mc', 'mos', "denny's")));
 $t->is($query,
        "AND desc LIKE '%' || :keyword_1 || '%' AND desc LIKE '%' || :keyword_2 || '%' AND desc LIKE '%' || :keyword_3 || '%' ",

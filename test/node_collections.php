@@ -42,6 +42,20 @@ class NodeCollections
         return self::_if(new SQLShade_Node_Expression_Name($name, $lineno), $content, $lineno);
     }
 
+    static public function _for($assignexpr, $listexpr, $content, $lineno = 1)
+    {
+        return new SQLShade_Node_For($assignexpr, $listexpr, $content, $lineno);
+    }
+
+    static public function _for_with_name($assignname, $listname, $content, $lineno = 1)
+    {
+        return self::_for(
+            new SQLShade_Node_Expression_AssignName($assignname, 1),
+            new SQLShade_Node_Expression_Name($listname, 1),
+            $content
+            );
+    }
+
     static public function _compound($nodes, $lineno = 1)
     {
         return new SQLShade_Node_Compound($nodes, 1);
@@ -84,5 +98,17 @@ class NodeCollections
                 self::_literal(';'),
                 ));
         return self::_module($node);
+    }
+
+    static public function iterate_keyword_conditions($asid = 'keyword', $listid = 'keywords')
+    {
+        $forcontent = self::_compound(
+            array(
+                self::_literal("AND desc LIKE '%' || "),
+                self::_substitute_with_name($asid, '123456'),
+                self::_literal(" || '%' "),
+                ));
+        $node = self::_for_with_name($asid, $listid, $forcontent);
+        return self::_module(self::_compound(array($node)));
     }
 }
