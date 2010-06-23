@@ -111,4 +111,16 @@ class NodeCollections
         $node = self::_for_with_name($asid, $listid, $forcontent);
         return self::_module(self::_compound(array($node)));
     }
+
+    static public function iterate_in_keyword_conditions($asid = 'and_kws', $listid = 'keywords')
+    {
+        $forcontent = self::_compound(
+            array(
+                self::_literal("OR desc IN "),
+                self::_substitute_with_name($asid, '123456'),
+                self::_literal(" "),
+                ));
+        $node = self::_for_with_name($asid, $listid, $forcontent);
+        return self::_module(self::_compound(array($node)));
+    }
 }

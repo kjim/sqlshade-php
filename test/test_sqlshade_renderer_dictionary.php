@@ -86,32 +86,13 @@ $t->is($query,
        'expand 3 times');
 $t->is($bound, array('keyword_1' => 'mc', 'keyword_2' => 'mos', 'keyword_3' => "denny's"));
 
-// @test
-$templateName = 'test_for_list.sql';
-$node = new SQLShade_Node_Module(
-    new SQLShade_Node_Compound(
-        array(
-            new SQLShade_Node_For(
-                new SQLShade_Node_Expression_AssignName('and_kws', 1),
-                new SQLShade_Node_Expression_Name('keywords', 1),
-                new SQLShade_Node_Compound(
-                    array(
-                        new SQLShade_Node_Literal("OR desc IN '%' || ", 1),
-                        new SQLShade_Node_Substitute(
-                            new SQLShade_Node_Expression_Name('and_kws', 1),
-                            '123456', 1),
-                        new SQLShade_Node_Literal(" || '%' ", 1),
-                        ),
-                    1),
-                1),
-            ),
-        1),
-    $templateName);
+// @test for
+$node = NodeCollections::iterate_in_keyword_conditions();
 list($query, $bound) = $renderer->render(
     $node, array('keywords' => array(array(1, 2), array(3, 4), array(5, 6))));
-$t->is($query, "OR desc IN '%' || (:and_kws_1_1, :and_kws_1_2) || '%' OR desc IN '%' || (:and_kws_2_1, :and_kws_2_2) || '%' OR desc IN '%' || (:and_kws_3_1, :and_kws_3_2) || '%' ",
+$t->is($query, "OR desc IN (:and_kws_1_1, :and_kws_1_2) OR desc IN (:and_kws_2_1, :and_kws_2_2) OR desc IN (:and_kws_3_1, :and_kws_3_2) ",
        '3 loops per list values');
-$t->is($bound, array('and_kws_1_1' => 1, 'and_kws_1_2' => 2,
+$t->is_deeply($bound, array('and_kws_1_1' => 1, 'and_kws_1_2' => 2,
                      'and_kws_2_1' => 3, 'and_kws_2_2' => 4,
                      'and_kws_3_1' => 5, 'and_kws_3_2' => 6));
 
