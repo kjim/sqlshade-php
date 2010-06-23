@@ -32,6 +32,16 @@ class NodeCollections
         return self::_embed(new SQLShade_Node_Expression_Name($name, $lineno), $content, $lineno);
     }
 
+    static public function _if($expr, $content, $lineno = 1)
+    {
+        return new SQLShade_Node_If($expr, $content, $lineno);
+    }
+
+    static public function _if_with_name($name, $content, $lineno = 1)
+    {
+        return self::_if(new SQLShade_Node_Expression_Name($name, $lineno), $content, $lineno);
+    }
+
     static public function _compound($nodes, $lineno = 1)
     {
         return new SQLShade_Node_Compound($nodes, 1);
@@ -54,12 +64,23 @@ class NodeCollections
         return self::_module($node);
     }
 
-    static public function replace_select_table($embedid = 'table')
+    static public function replace_select_from_table($embedid = 'table')
     {
         $node = self::_compound(
             array(
                 self::_literal('SELECT * FROM '),
                 self::_embed_with_name($embedid, self::_compound(array(self::_literal('t_table')))),
+                self::_literal(';'),
+                ));
+        return self::_module($node);
+    }
+
+    static public function enable_or_disable_true_condition($ifid = 'boolean_item')
+    {
+        $node = self::_compound(
+            array(
+                self::_literal('SELECT * FROM t_table '),
+                self::_if_with_name($ifid, self::_compound(array(self::_literal('WHERE TRUE')))),
                 self::_literal(';'),
                 ));
         return self::_module($node);

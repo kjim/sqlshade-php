@@ -37,7 +37,7 @@ try {
 }
 
 // @test
-$node = NodeCollections::replace_select_table();
+$node = NodeCollections::replace_select_from_table();
 list($query, $bound) = $renderer->render($node, array('table' => 't_table_extension'));
 $t->is($query, 'SELECT * FROM t_table_extension;', 'embed t_table_extension');
 
@@ -46,22 +46,8 @@ $t->is($query, 'SELECT * FROM t_table_test;', 'embed t_table_test');
 
 // @test
 $templateName = 'test_if.sql';
-$node = new SQLShade_Node_Module(
-    new SQLShade_Node_Compound(
-        array(
-            new SQLShade_Node_Literal('SELECT * FROM t_table ', 1),
-            new SQLShade_Node_If(
-                new SQLShade_Node_Expression_Name('boolean_item', 1),
-                new SQLShade_Node_Compound(
-                    array(
-                        new SQLShade_Node_Literal('WHERE TRUE', 1),
-                        ),
-                    1),
-                1),
-            new SQLShade_Node_Literal(';', 1),
-            ),
-        1),
-    $templateName);
+$node = NodeCollections::enable_or_disable_true_condition();
+
 // boolean
 list($query, $_) = $renderer->render($node, array('boolean_item' => true));
 $t->like($query, '/WHERE TRUE/', 'true is enable if-block');
