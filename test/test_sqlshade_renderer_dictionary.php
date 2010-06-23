@@ -6,32 +6,21 @@ require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Module.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Compound.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Literal.php');
 
+require_once(dirname(__FILE__).'/node_collections.php');
+
 $t = new lime_test();
 $env = new SQLShade_Environment();
 $renderer = new SQLShade_Renderer_Dictionary($env);
 
-// @test
-$templateName = 'test_literal.sql';
-$node = new SQLShade_Node_Module(
-    new SQLShade_Node_Compound(
-        array(
-            new SQLShade_Node_Literal('SELECT * FROM t_table;', 1),
-            ), 1),
-    $templateName);
+// @test only sql literal
+$node = NodeCollections::no_blocks_and_no_vars('SELECT * FROM t_table;');
 list($query, $bound) = $renderer->render($node, array());
 
 $t->is($query, 'SELECT * FROM t_table;', 'generates query for prepare');
 $t->is($bound, array(), 'bound variables are empty');
 
 // @test
-$templateName = 'test_substitute.sql';
-$node = new SQLShade_Node_Module(
-    new SQLShade_Node_Compound(
-        array(
-            new SQLShade_Node_Substitute(
-                new SQLShade_Node_Expression_Name('uid', 1), '123456', 1),
-            ), 1),
-    $templateName);
+$node = NodeCollections::one_substitute('uid', '123456');
 list($query, $bound) = $renderer->render($node, array('uid' => 3456));
 $t->is($query, ':uid', 'scalar makes one placeholder');
 $t->is_deeply($bound, array('uid' => 3456));
