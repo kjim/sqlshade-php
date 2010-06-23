@@ -123,4 +123,20 @@ class NodeCollections
         $node = self::_for_with_name($asid, $listid, $forcontent);
         return self::_module(self::_compound(array($node)));
     }
+
+    static public function object_syntax_iteration($asid = 'iteritem', $listid = 'iterate_values')
+    {
+        $forcontent = self::_compound(
+            array(
+                self::_literal(' OR (ident = '),
+                self::_substitute_with_name("$asid.ident", 9999),
+                self::_literal(' AND password = '),
+                self::_substitute_with_name("$asid.password", 'test_pass'),
+                self::_literal(' AND status IN '),
+                self::_substitute_with_name("$asid.status", '(1, 2, 3)'),
+                self::_literal(')'),
+                ));
+        $node = self::_for_with_name($asid, $listid, $forcontent);
+        return self::_module(self::_compound(array($node)));
+    }
 }

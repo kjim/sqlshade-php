@@ -97,31 +97,7 @@ $t->is_deeply($bound, array('and_kws_1_1' => 1, 'and_kws_1_2' => 2,
                      'and_kws_3_1' => 5, 'and_kws_3_2' => 6));
 
 // @test
-$templateName = 'test_for_named_iteration.sql';
-$node = new SQLShade_Node_Module(
-    new SQLShade_Node_Compound(
-        array(
-            new SQLShade_Node_For(
-                new SQLShade_Node_Expression_AssignName('iteritem', 1),
-                new SQLShade_Node_Expression_Name('iterate_values', 1),
-                new SQLShade_Node_Compound(
-                    array(
-                        new SQLShade_Node_Literal(' OR (ident = ', 1),
-                        new SQLShade_Node_Substitute(
-                            new SQLShade_Node_Expression_Name('iteritem.ident', 1), 9999, 1),
-                        new SQLShade_Node_Literal(' AND password = ', 1),
-                        new SQLShade_Node_Substitute(
-                            new SQLShade_Node_Expression_Name('iteritem.password', 1), 'test_pass', 1),
-                        new SQLShade_Node_Literal(' AND status IN ', 1),
-                        new SQLShade_Node_Substitute(
-                            new SQLShade_Node_Expression_Name('iteritem.status', 1), '(1, 2, 3)', 1),
-                        new SQLShade_Node_Literal(')', 1),
-                        ),
-                    1),
-                1),
-            ),
-        1),
-    $templateName);
+$node = NodeCollections::object_syntax_iteration();
 $context = array(
     'iterate_values' => array(
         array('ident' => 1105, 'password' => 'kjim_pass', 'status' => array(1, 2)),
