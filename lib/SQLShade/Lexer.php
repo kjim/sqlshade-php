@@ -20,7 +20,8 @@ require_once(dirname(__FILE__).'/SyntaxError.php');
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
  * @version    SVN: $Id$
  */
-class SQLShade_Lexer {
+class SQLShade_Lexer
+{
     protected $cursor;
     protected $position;
     protected $end;

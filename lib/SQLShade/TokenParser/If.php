@@ -4,9 +4,10 @@ require_once(dirname(__FILE__).'/../Token.php');
 require_once(dirname(__FILE__).'/../Node/If.php');
 require_once(dirname(__FILE__).'/../Node/Expression/Name.php');
 
-class SQLShade_TokenParser_If extends SQLShade_TokenParser {
-
-    public function parse(SQLShade_Token $token) {
+class SQLShade_TokenParser_If extends SQLShade_TokenParser
+{
+    public function parse(SQLShade_Token $token)
+    {
         $lineno = $token->getLine();
 
         $expr = $this->parser->getExpressionParser()->parseExpression();
@@ -18,16 +19,18 @@ class SQLShade_TokenParser_If extends SQLShade_TokenParser {
         return new SQLShade_Node_If($expr, $compound, $lineno, null);
     }
 
-    public function decideEnd($token) {
+    public function decideEnd($token)
+    {
         return $token->test($this->getEndTag());
     }
 
-    public function getTag() {
+    public function getTag()
+    {
         return 'if';
     }
 
-    public function getEndTag() {
+    public function getEndTag()
+    {
         return 'endif';
     }
-
 }

@@ -1,38 +1,43 @@
 <?php
 require_once(dirname(__FILE__).'/KeyError.php');
 
-class SQLShade_RenderContext {
-
+class SQLShade_RenderContext
+{
     public $data;
     public $env;
 
-    public function __construct($data, $env = array()) {
+    public function __construct($data, $env = array())
+    {
         $this->data = new SQLShade_RenderContext_InnerArray($data);
         $this->env = $env;
     }
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->data = clone($this->data);
         $this->env = $this->env;
     }
 
 }
 
-class SQLShade_RenderContext_InnerArray implements ArrayAccess {
-
+class SQLShade_RenderContext_InnerArray implements ArrayAccess
+{
     protected $source;
 
-    public function __construct($source) {
+    public function __construct($source)
+    {
         $this->source = $source;
     }
 
-    public function update($data) {
+    public function update($data)
+    {
         foreach ($data as $k => $v) {
             $this->source[$k] = $v;
         }
     }
 
-    protected function & get($ident) {
+    protected function & get($ident)
+    {
         $identStruct = explode('.', $ident);
         $tmp =& $this->source;
         foreach ($identStruct as $e) {
@@ -44,7 +49,8 @@ class SQLShade_RenderContext_InnerArray implements ArrayAccess {
         return $tmp;
     }
 
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         try {
             $this->get($offset);
             return true;
@@ -53,20 +59,23 @@ class SQLShade_RenderContext_InnerArray implements ArrayAccess {
         }
     }
 
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->get($offset);
     }
 
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         throw new Exception("not supported");
     }
 
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         throw new Exception("not supported");
     }
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->source = $this->source;
     }
-
 }

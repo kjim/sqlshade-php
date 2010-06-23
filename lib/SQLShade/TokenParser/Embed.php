@@ -5,9 +5,10 @@ require_once(dirname(__FILE__).'/../Token.php');
 require_once(dirname(__FILE__).'/../Node/Embed.php');
 require_once(dirname(__FILE__).'/../Node/Expression/Name.php');
 
-class SQLShade_TokenParser_Embed extends SQLShade_TokenParser_If {
-
-    public function parse(/*Token*/$token) {
+class SQLShade_TokenParser_Embed extends SQLShade_TokenParser_If
+{
+    public function parse(/*Token*/$token)
+    {
         $lineno = $token->getLine();
 
         $expr = $this->parser->getExpressionParser()->parsePrimaryExpression();
@@ -19,12 +20,13 @@ class SQLShade_TokenParser_Embed extends SQLShade_TokenParser_If {
         return new SQLShade_Node_Embed($expr, $compound, $lineno, null);
     }
 
-    public function getTag() {
+    public function getTag()
+    {
         return 'embed';
     }
 
-    public function getEndTag() {
+    public function getEndTag()
+    {
         return 'endembed';
     }
-
 }

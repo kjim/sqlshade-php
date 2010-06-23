@@ -1,4 +1,5 @@
 <?php
 
-class SQLShade_Error extends Exception {
+class SQLShade_Error extends Exception
+{
 }

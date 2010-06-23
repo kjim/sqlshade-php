@@ -8,16 +8,15 @@ require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Substitute.php');
 
 $t = new lime_test();
 
-class Example extends SQLShade_Node {
-
+class Example extends SQLShade_Node
+{
     public function getVisitName() {
         return parent::getVisitName();
     }
-
 }
 
-class Walker {
-
+class Walker
+{
     public $logs;
 
     public function __construct() {
@@ -51,7 +50,6 @@ class Walker {
     protected function log($nodetag) {
         $this->logs[] = $nodetag;
     }
-
 }
 
 // @test

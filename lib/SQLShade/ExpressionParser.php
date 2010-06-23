@@ -7,25 +7,29 @@ require_once(dirname(__FILE__).'/Node/Expression/AttrName.php');
 require_once(dirname(__FILE__).'/Node/Expression/AssignName.php');
 require_once(dirname(__FILE__).'/Node/Expression/Unary/Not.php');
 
-class SQLShade_ExpressionParser {
-
+class SQLShade_ExpressionParser
+{
     protected $parser;
 
-    public function __construct($parser) {
+    public function __construct($parser)
+    {
         $this->parser = $parser;
     }
 
-    public function parseExpression() {
+    public function parseExpression()
+    {
         return $this->parseConditionalExpression();
     }
 
-    public function parseConditionalExpression() {
+    public function parseConditionalExpression()
+    {
         $lineno = $this->parser->getCurrentToken()->getLine();
         $expr = $this->parseUnaryExpression();
         return $expr;
     }
 
-    public function parseUnaryExpression() {
+    public function parseUnaryExpression()
+    {
         if ($this->parser->getStream()->test('not')) {
             return $this->parseNotExpression();
         }
@@ -33,14 +37,16 @@ class SQLShade_ExpressionParser {
         return $this->parsePrimaryExpression();
     }
 
-    public function parseNotExpression() {
+    public function parseNotExpression()
+    {
         $token = $this->parser->getStream()->next();
         $node = $this->parseUnaryExpression();
 
         return new SQLShade_Node_Expression_Unary_Not($node, $token->getLine());
     }
 
-    public function parsePrimaryExpression($assignment = false) {
+    public function parsePrimaryExpression($assignment = false)
+    {
         $token = $this->parser->getCurrentToken();
         switch ($token->getType()) {
             case SQLShade_Token::NAME_TYPE:
@@ -73,7 +79,8 @@ class SQLShade_ExpressionParser {
         return $node;
     }
 
-    public function parsePostfixExpression($node) {
+    public function parsePostfixExpression($node)
+    {
         static $SUBSCRIPT_OPS = array('.', '[');
 
         $stop = false;
@@ -93,7 +100,8 @@ class SQLShade_ExpressionParser {
         return $node;
     }
 
-    public function parseSubscriptExpression($node) {
+    public function parseSubscriptExpression($node)
+    {
         $token = $this->parser->getStream()->next();
         $lineno = $token->getLine();
         if ($token->getValue() == '.') {
@@ -110,5 +118,4 @@ class SQLShade_ExpressionParser {
 
         return new SQLShade_Node_Expression_AttrName($node, $attr, $lineno);
     }
-
 }

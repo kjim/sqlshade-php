@@ -5,9 +5,10 @@ require_once(dirname(__FILE__).'/../Node/For.php');
 require_once(dirname(__FILE__).'/../Node/Expression/AssignName.php');
 require_once(dirname(__FILE__).'/../Node/Expression/Name.php');
 
-class SQLShade_TokenParser_For extends SQLShade_TokenParser {
-
-    public function parse(SQLShade_Token $token) {
+class SQLShade_TokenParser_For extends SQLShade_TokenParser
+{
+    public function parse(SQLShade_Token $token)
+    {
         $lineno = $token->getLine();
 
         $alias = $this->parser->getExpressionParser()->parsePrimaryExpression(true);
@@ -22,16 +23,18 @@ class SQLShade_TokenParser_For extends SQLShade_TokenParser {
         return new SQLShade_Node_For($alias, $sequence, $compound, $lineno, null);
     }
 
-    public function decideForEnd($token) {
+    public function decideForEnd($token)
+    {
         return $token->test($this->getEndTag());
     }
 
-    public function getTag() {
+    public function getTag()
+    {
         return 'for';
     }
 
-    public function getEndTag() {
+    public function getEndTag()
+    {
         return 'endfor';
     }
-
 }

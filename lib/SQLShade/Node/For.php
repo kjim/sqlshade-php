@@ -1,13 +1,14 @@
 <?php
 require_once(dirname(__FILE__).'/../Node.php');
 
-class SQLShade_Node_For extends SQLShade_Node {
-
+class SQLShade_Node_For extends SQLShade_Node
+{
     protected $item;
     protected $ident;
     protected $body;
 
-    public function __construct($item, $ident, /*Node_Compound*/$body, $lineno) {
+    public function __construct($item, $ident, /*Node_Compound*/$body, $lineno)
+    {
         parent::__construct($lineno);
 
         $this->item = $item;
@@ -15,20 +16,23 @@ class SQLShade_Node_For extends SQLShade_Node {
         $this->body = $body;
     }
 
-    public function getItem() {
+    public function getItem()
+    {
         return $this->item;
     }
 
-    public function getIdent() {
+    public function getIdent()
+    {
         return $this->ident;
     }
 
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
 
-    public function getChildren() {
+    public function getChildren()
+    {
         return $this->body->getChildren();
     }
-
 }

@@ -6,9 +6,10 @@ require_once(dirname(__FILE__).'/../TokenParser/Embed.php');
 
 require_once(dirname(__FILE__).'/../Renderer/Index.php');
 
-class SQLShade_Extension_Core {
-
-    public function getTokenParsers() {
+class SQLShade_Extension_Core
+{
+    public function getTokenParsers()
+    {
         return array(
             new SQLShade_TokenParser_Substitute(),
             new SQLShade_TokenParser_For(),
@@ -17,10 +18,10 @@ class SQLShade_Extension_Core {
             );
     }
 
-    public function getRendererClasses() {
+    public function getRendererClasses()
+    {
         return array(
             'list' => 'SQLShade_Renderer_Index',
             );
     }
-
 }

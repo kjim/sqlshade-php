@@ -158,7 +158,8 @@ class SQLShade_TokenStream
         return $this->filename;
     }
 
-    public function setTrimBlocks(boolean $trimBlocks) {
+    public function setTrimBlocks(boolean $trimBlocks)
+    {
         $this->trimBlocks = $trimBlocks;
     }
 }

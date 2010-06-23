@@ -4,14 +4,15 @@ require_once(dirname(__FILE__).'/../Token.php');
 require_once(dirname(__FILE__).'/../Node/Substitute.php');
 require_once(dirname(__FILE__).'/../Node/Literal.php');
 
-class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
-
+class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser
+{
     static protected $SOULD_BE_END_CHAR_RULES = array(
         "(" => ")",
         "'" => "'",
         );
 
-    public function parse(SQLShade_Token $token) {
+    public function parse(SQLShade_Token $token)
+    {
         $lineno = $token->getLine();
 
         $expr = $this->parser->getExpressionParser()->parsePrimaryExpression();
@@ -28,7 +29,8 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         return new SQLShade_Node_Substitute($expr, $faketext, $lineno, null);
     }
 
-    public function _parseFaketext($text, $lineno) {
+    public function _parseFaketext($text, $lineno)
+    {
         if (is_null($text) || strlen($text) <= 0) {
             return ''; // return empty string
         }
@@ -45,7 +47,8 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         }
     }
 
-    static public function _parseUntilEndOfFaketext($text, $shouldBeEndChar = null) {
+    static public function _parseUntilEndOfFaketext($text, $shouldBeEndChar = null)
+    {
         if (!$text) {
             return -1;
         }
@@ -98,8 +101,8 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser {
         }
     }
 
-    public function getTag() {
+    public function getTag()
+    {
         return "substitute";
     }
-
 }

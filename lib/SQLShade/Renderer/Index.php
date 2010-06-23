@@ -3,23 +3,26 @@ require_once(dirname(__FILE__).'/../Printer/Index.php');
 require_once(dirname(__FILE__).'/../RenderContext.php');
 require_once(dirname(__FILE__).'/../RenderError.php');
 
-class SQLShade_Renderer_Index {
-
+class SQLShade_Renderer_Index
+{
     protected $env;
     protected $strict;
 
-    public function __construct($env, $strict = true) {
+    public function __construct($env, $strict = true)
+    {
         $this->env = $env;
         $this->strict = $strict;
     }
 
-    public function render(/*Node_Module*/$node, $data = array()) {
+    public function render(/*Node_Module*/$node, $data = array())
+    {
         $printer = new SQLShade_Printer_Index();
         $context = new SQLShade_RenderContext($data);
         return $this->_render($node, $context, $printer);
     }
 
-    protected function _render($node, $context, $printer = null) {
+    protected function _render($node, $context, $printer = null)
+    {
         if ($printer === null) {
             $printer = new SQLShade_Printer_Index();
         }
@@ -29,13 +32,15 @@ class SQLShade_Renderer_Index {
         return $printer->freeze();
     }
 
-    protected function traverse($node, &$ctx) {
+    protected function traverse($node, &$ctx)
+    {
         foreach ($node->getChildren() as $n) {
             $n->acceptVisitor($this, $ctx);
         }
     }
 
-    protected function toAttributeAccessKey($node) {
+    protected function toAttributeAccessKey($node)
+    {
         $nodetype = get_class($node);
         if ($nodetype === 'SQLShade_Node_Expression_Name') {
             return $node->getName();
@@ -52,7 +57,8 @@ class SQLShade_Renderer_Index {
         throw new LogicException("Unexpected node type: " . $nodetype);
     }
 
-    protected function getAttribute($node, $context) {
+    protected function getAttribute($node, $context)
+    {
         switch (get_class($node)) {
             case 'SQLShade_Node_Expression_Constant':
                 $attribute = $node->getValue();
@@ -66,12 +72,14 @@ class SQLShade_Renderer_Index {
         return $attribute;
     }
 
-    public function visitLiteral($node, &$ctx) {
+    public function visitLiteral($node, &$ctx)
+    {
         $printer = $ctx['printer'];
         $printer->write($node->getLiteral());
     }
 
-    public function visitSubstitute($node, &$ctx) {
+    public function visitSubstitute($node, &$ctx)
+    {
         $context = $ctx['context'];
         $expr = $node->getExpr();
         try {
@@ -85,7 +93,8 @@ class SQLShade_Renderer_Index {
         $this->writeSubstitute($node, $ctx, $variable);
     }
 
-    protected function writeSubstitute($node, &$ctx, &$variable) {
+    protected function writeSubstitute($node, &$ctx, &$variable)
+    {
         $printer = $ctx['printer'];
         if (is_array($variable)) {
             if (count($variable) === 0) {
@@ -102,7 +111,8 @@ class SQLShade_Renderer_Index {
         }
     }
 
-    public function visitEmbed($node, &$ctx) {
+    public function visitEmbed($node, &$ctx)
+    {
         $context = $ctx['context'];
         $expr = $node->getExpr();
         try {
@@ -116,7 +126,8 @@ class SQLShade_Renderer_Index {
         $this->writeEmbed($node, $ctx, $variable);
     }
 
-    protected function writeEmbed($node, &$ctx, &$variable) {
+    protected function writeEmbed($node, &$ctx, &$variable)
+    {
         if (is_callable(array($variable, "getNode"))) {
             $subnode = $variable->getNode();
             list($query, $bound) = $this->_render($subnode, $ctx['context']);
@@ -132,7 +143,8 @@ class SQLShade_Renderer_Index {
         }
     }
 
-    public function visitIf($node, &$ctx) {
+    public function visitIf($node, &$ctx)
+    {
         $context = $ctx['context'];
         $expr = $node->getExpr();
         try {
@@ -146,13 +158,15 @@ class SQLShade_Renderer_Index {
         $this->writeIf($node, $ctx, $variable);
     }
 
-    protected function writeIf($node, &$ctx, &$variable) {
+    protected function writeIf($node, &$ctx, &$variable)
+    {
         if ($variable) {
             $this->traverse($node, $ctx);
         }
     }
 
-    public function visitFor($node, &$ctx) {
+    public function visitFor($node, &$ctx)
+    {
         $context = $ctx['context'];
         $ident = $node->getIdent();
         try {
@@ -167,7 +181,8 @@ class SQLShade_Renderer_Index {
         $this->writeFor($node, $ctx, $alias, $sequence);
     }
 
-    protected function writeFor($node, &$ctx, &$alias, &$sequence) {
+    protected function writeFor($node, &$ctx, &$alias, &$sequence)
+    {
         $forBlockContext = clone($ctx['context']);
         $forBlockCtx = $ctx;
         $forBlockCtx['context'] = $forBlockContext;
@@ -176,5 +191,4 @@ class SQLShade_Renderer_Index {
             $this->traverse($node, $forBlockCtx);
         }
     }
-
 }

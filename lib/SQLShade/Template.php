@@ -1,15 +1,16 @@
 <?php
 require_once(dirname(__FILE__).'/Environment.php');
 
-class SQLShade_Template {
-
+class SQLShade_Template
+{
     static protected $defaultEnvironment;
 
     protected $name;
     protected $node;
     protected $renderer;
 
-    public function __construct($source, $options = array()) {
+    public function __construct($source, $options = array())
+    {
         $options = array_merge(
             array('strict' => true,
                   'parameter_format' => 'list',
@@ -25,24 +26,27 @@ class SQLShade_Template {
         $this->node = $env->compileSource($source, $this->name);
     }
 
-    public function render($context = array()) {
+    public function render($context = array())
+    {
         return $this->renderer->render($this->node, $context);
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function getNode() {
+    public function getNode()
+    {
         return $this->node;
     }
 
-    static protected function getDefaultEnvironment() {
+    static protected function getDefaultEnvironment()
+    {
         if (self::$defaultEnvironment === null) {
             self::$defaultEnvironment = new SQLShade_Environment();
         }
 
         return self::$defaultEnvironment;
     }
-
 }

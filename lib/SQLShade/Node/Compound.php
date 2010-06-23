@@ -1,17 +1,19 @@
 <?php
 require_once(dirname(__FILE__).'/../Node.php');
 
-class SQLShade_Node_Compound extends SQLShade_Node {
-
+class SQLShade_Node_Compound extends SQLShade_Node
+{
     protected $nodes;
 
-    public function __construct(array $nodes, $lineno = 0) {
+    public function __construct(array $nodes, $lineno = 0)
+    {
         parent::__construct($lineno);
 
         $this->nodes = $nodes;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         $repr = array(get_class($this), '(');
         $repr[] = '[';
         foreach ($this->nodes as $node) {
@@ -21,12 +23,13 @@ class SQLShade_Node_Compound extends SQLShade_Node {
         return implode('', $repr);
     }
 
-    public function getChildren() {
+    public function getChildren()
+    {
         return $this->nodes;
     }
 
-    public function appendNode(/*Node*/$node) {
+    public function appendNode(/*Node*/$node)
+    {
         $this->nodes[] = $node;
     }
-
 }

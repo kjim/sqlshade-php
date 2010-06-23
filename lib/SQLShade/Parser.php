@@ -8,28 +8,32 @@ require_once(dirname(__FILE__).'/Node/Literal.php');
 require_once(dirname(__FILE__).'/Node/Substitute.php');
 require_once(dirname(__FILE__).'/Node/Compound.php');
 
-class SQLShade_Parser {
-
+class SQLShade_Parser
+{
     protected $stream;
     protected $handlers;
     protected $expressionParser;
     protected $env;
 
-    public function __construct($env = null) {
+    public function __construct($env = null)
+    {
         if (null != $env) {
             $this->setEnvironment($env);
         }
     }
 
-    public function setEnvironment($env) {
+    public function setEnvironment($env)
+    {
         $this->env = $env;
     }
 
-    public function parse($stream) {
+    public function parse($stream)
+    {
         $this->handlers = array();
 
         // tag handlers
-        foreach ($this->env->getTokenParsers() as $handler) {
+        foreach ($this->env->getTokenParsers() as $handler)
+        {
             $handler->setParser($this);
             $this->handlers[$handler->getTag()] = $handler;
         }
@@ -49,7 +53,8 @@ class SQLShade_Parser {
         return new SQLShade_Node_Module($body, $this->stream->getFilename());
     }
 
-    public function subparse($test, $drop_needle = false) {
+    public function subparse($test, $drop_needle = false)
+    {
         $lineno = $this->getCurrentToken()->getLine();
         $rv = array();
         while (!$this->stream->isEOF()) {
@@ -115,7 +120,8 @@ class SQLShade_Parser {
         return new SQLShade_Node_Compound($rv, $lineno);
     }
 
-    public function subskip($test, $drop_needle = false) {
+    public function subskip($test, $drop_needle = false)
+    {
         $lineno = $this->getCurrentToken()->getLine();
         while (!$this->stream->isEOF()) {
             $tokentype = $this->getCurrentToken()->getType();
@@ -143,28 +149,32 @@ class SQLShade_Parser {
         return new SQLShade_Node_Compound(array(), $lineno);
     }
 
-    public function addHandler($name, $class) {
+    public function addHandler($name, $class)
+    {
         $this->handlers[$name] = $class;
     }
 
-    public function getStream() {
+    public function getStream()
+    {
         return $this->stream;
     }
 
-    public function setStream($stream) {
+    public function setStream($stream)
+    {
         $this->stream = $stream;
     }
 
-    public function getCurrentToken() {
+    public function getCurrentToken()
+    {
         return $this->stream->getCurrent();
     }
 
-    public function getExpressionParser() {
+    public function getExpressionParser()
+    {
         if ($this->expressionParser === null) {
             $this->expressionParser = new SQLShade_ExpressionParser($this);
         }
 
         return $this->expressionParser;
     }
-
 }
