@@ -1,9 +1,9 @@
 <?php
-require_once(dirname(__FILE__).'/../Printer/Index.php');
+require_once(dirname(__FILE__).'/../Printer/Array.php');
 require_once(dirname(__FILE__).'/../RenderContext.php');
 require_once(dirname(__FILE__).'/../RenderError.php');
 
-class SQLShade_Renderer_Index
+class SQLShade_Renderer_Array
 {
     protected $env;
     protected $strict;
@@ -16,7 +16,7 @@ class SQLShade_Renderer_Index
 
     public function render(/*Node_Module*/$node, $data = array())
     {
-        $printer = new SQLShade_Printer_Index();
+        $printer = new SQLShade_Printer_Array();
         $context = new SQLShade_RenderContext($data);
         return $this->_render($node, $context, $printer);
     }
@@ -24,7 +24,7 @@ class SQLShade_Renderer_Index
     protected function _render($node, $context, $printer = null)
     {
         if ($printer === null) {
-            $printer = new SQLShade_Printer_Index();
+            $printer = new SQLShade_Printer_Array();
         }
 
         $ctx = array('printer' => $printer, 'context' => $context);

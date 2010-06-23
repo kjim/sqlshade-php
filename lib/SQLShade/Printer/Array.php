@@ -1,6 +1,6 @@
 <?php
 
-class SQLShade_Printer_Index
+class SQLShade_Printer_Array
 {
     protected $buf;
     protected $bound;

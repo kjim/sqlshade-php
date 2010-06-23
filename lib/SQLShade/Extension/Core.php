@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/../TokenParser/For.php');
 require_once(dirname(__FILE__).'/../TokenParser/If.php');
 require_once(dirname(__FILE__).'/../TokenParser/Embed.php');
 
-require_once(dirname(__FILE__).'/../Renderer/Index.php');
+require_once(dirname(__FILE__).'/../Renderer/Array.php');
 
 class SQLShade_Extension_Core
 {
@@ -21,7 +21,7 @@ class SQLShade_Extension_Core
     public function getRendererClasses()
     {
         return array(
-            'list' => 'SQLShade_Renderer_Index',
+            'list' => 'SQLShade_Renderer_Array',
             );
     }
 }

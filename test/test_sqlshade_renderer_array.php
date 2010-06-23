@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__).'/bootstrap.php');
-require_once(dirname(__FILE__).'/../lib/SQLShade/Renderer/Index.php');
+require_once(dirname(__FILE__).'/../lib/SQLShade/Renderer/Array.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Environment.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Module.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Compound.php');
@@ -8,7 +8,7 @@ require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Literal.php');
 
 $t = new lime_test();
 $env = new SQLShade_Environment();
-$renderer = new SQLShade_Renderer_Index($env);
+$renderer = new SQLShade_Renderer_Array($env);
 
 // @test
 $templateName = 'test_literal.sql';
