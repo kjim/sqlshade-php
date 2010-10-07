@@ -25,7 +25,7 @@ class SQLShade_TokenParser_Substitute extends SQLShade_TokenParser
 
         $tokenvalue = $token->getValue();
         $faketext = $this->_parseFaketext($tokenvalue, $token->getLine());
-        $token->setValue(str_replace($faketext, '', $tokenvalue));
+        $token->setValue(substr($tokenvalue, strlen($faketext)));
         return new SQLShade_Node_Substitute($expr, $faketext, $lineno, null);
     }
 
