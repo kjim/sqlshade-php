@@ -3,4 +3,5 @@ require_once(dirname(__FILE__).'/test/bootstrap.php');
 
 $h = new lime_harness(new lime_output_color());
 $h->register(dirname(__FILE__)."/test");
+$h->register(dirname(__FILE__)."/test/bugs");
 $h->run();
