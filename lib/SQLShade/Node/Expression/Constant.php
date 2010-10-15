@@ -11,6 +11,11 @@ class SQLShade_Node_Expression_Constant extends SQLShade_Node_Expression
         $this->value = $value;
     }
 
+    public function __toString()
+    {
+        return get_class($this).'(' . $this->value . ')';
+    }
+
     public function getValue()
     {
         return $this->value;

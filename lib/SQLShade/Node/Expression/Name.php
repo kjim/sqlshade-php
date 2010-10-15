@@ -11,6 +11,11 @@ class SQLShade_Node_Expression_Name extends SQLShade_Node_Expression
         $this->name = $name;
     }
 
+    public function __toString()
+    {
+        return get_class($this).'(' . $this->name . ')';
+    }
+
     public function getName()
     {
         return $this->name;
