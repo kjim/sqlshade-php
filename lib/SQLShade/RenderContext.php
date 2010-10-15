@@ -41,7 +41,7 @@ class SQLShade_RenderContext_InnerArray implements ArrayAccess
         $identStruct = explode('.', $ident);
         $tmp =& $this->source;
         foreach ($identStruct as $e) {
-            if (!isset($tmp[$e])) {
+            if (!array_key_exists($e, $tmp)) {
                 throw new SQLShade_KeyError($ident);
             }
             $tmp =& $tmp[$e];
