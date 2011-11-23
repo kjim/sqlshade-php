@@ -12,14 +12,6 @@ require_once(dirname(__FILE__).'/SyntaxError.php');
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-/**
- * Lexes a template string.
- *
- * @package    twig
- * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id$
- */
 class SQLShade_Lexer
 {
     protected $cursor;
