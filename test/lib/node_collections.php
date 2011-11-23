@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Module.php');
-require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Compound.php');
-require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Literal.php');
-require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Substitute.php');
+require_once(dirname(__FILE__).'/../../lib/SQLShade/Node/Module.php');
+require_once(dirname(__FILE__).'/../../lib/SQLShade/Node/Compound.php');
+require_once(dirname(__FILE__).'/../../lib/SQLShade/Node/Literal.php');
+require_once(dirname(__FILE__).'/../../lib/SQLShade/Node/Substitute.php');
 
 class NodeCollections
 {

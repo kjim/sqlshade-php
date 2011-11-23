@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/bootstrap.php');
+require_once(dirname(__FILE__).'/lib/bootstrap.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Compound.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/If.php');

@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__).'/bootstrap.php');
-require_once(dirname(__FILE__).'/node_collections.php');
+require_once(dirname(__FILE__).'/lib/bootstrap.php');
+require_once(dirname(__FILE__).'/lib/node_collections.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Renderer/Dictionary.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Environment.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Node/Module.php');

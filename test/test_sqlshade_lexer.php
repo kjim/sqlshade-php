@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/bootstrap.php');
+require_once(dirname(__FILE__).'/lib/bootstrap.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Lexer.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Environment.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Token.php');

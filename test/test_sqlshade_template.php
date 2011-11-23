@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/bootstrap.php');
+require_once(dirname(__FILE__).'/lib/bootstrap.php');
 require_once(dirname(__FILE__).'/../lib/SQLShade/Template.php');
 
 $t = new lime_test();
