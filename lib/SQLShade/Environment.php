@@ -5,6 +5,8 @@ require_once(dirname(__FILE__).'/Extension/Core.php');
 
 class SQLShade_Environment
 {
+    const VERSION = '0.0.1';
+
     protected $charset;
     protected $loader;
     protected $lexer;
