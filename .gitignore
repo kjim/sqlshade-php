@@ -2,3 +2,4 @@ lib/vendor/twig
 test/vendor/lime
 lib/vendor/lime
 *~
+test/vendor
